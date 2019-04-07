@@ -13,7 +13,7 @@ function getModel() {
   const IMAGE_CHANNELS = 1
 
   // In the first layer of out convolutional neural network we have
-  // to specify the input shape. Then we specify some paramaters for
+  // to specify the input shape. Then we specify some parameters for
   // the convolution operation that takes place in this layer.
   model.add(
     tf.layers.conv2d({
@@ -228,7 +228,14 @@ class App extends Component {
               const model = getModel()
               tfvis.show.modelSummary({ name: 'Model Architecture' }, model)
               this.model = model
-              await train(model, this.data)
+            }}
+          >
+            Create Model
+          </button>
+
+          <button
+            onClick={async () => {
+              await train(this.model, this.data)
             }}
           >
             Train
