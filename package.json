@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tensorflow/tfjs": "^1.0.4",
+    "@tensorflow/tfjs-vis": "^1.0.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "seedrandom": "~2.4.3"
   },
   "scripts": {
     "start": "react-scripts start",
