@@ -1,25 +1,10 @@
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
 // Gant ADD
 import * as tf from '@tensorflow/tfjs'
 
 const IMAGE_SIZE = 784
-const NUM_CLASSES = 10
-const NUM_DATASET_ELEMENTS = 65000
+const NUM_CLASSES = 3
+// const NUM_DATASET_ELEMENTS = 65000
+const NUM_DATASET_ELEMENTS = 2520
 
 const TRAIN_TEST_RATIO = 5 / 6
 
@@ -27,16 +12,11 @@ const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
 const MNIST_IMAGES_SPRITE_PATH =
-  'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png'
+  // 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png'
+  'http://localhost:3000/data.png'  
 const MNIST_LABELS_PATH =
   'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8'
 
-/**
- * A class that fetches the sprited MNIST dataset and returns shuffled batches.
- *
- * NOTE: This will get much easier. For now, we do data fetching and
- * manipulation manually.
- */
 export class MnistData {
   constructor() {
     this.shuffledTrainIndex = 0
@@ -44,7 +24,7 @@ export class MnistData {
   }
 
   async load() {
-    // Make a request for the MNIST sprited image.
+    // Make a request for the RPS sprited image.
     const img = new Image()
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
@@ -58,7 +38,7 @@ export class MnistData {
           NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
         )
 
-        const chunkSize = 5000
+        const chunkSize = 60
         canvas.width = img.width
         canvas.height = chunkSize
 
