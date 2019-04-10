@@ -1,9 +1,8 @@
-// Gant ADD
 import * as tf from '@tensorflow/tfjs'
 
-const IMAGE_SIZE = 784
+// 64x64
+const IMAGE_SIZE = 4096
 const NUM_CLASSES = 3
-// const NUM_DATASET_ELEMENTS = 65000
 const NUM_DATASET_ELEMENTS = 2520
 
 const TRAIN_TEST_RATIO = 5 / 6
@@ -12,7 +11,6 @@ const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
 const MNIST_IMAGES_SPRITE_PATH =
-  // 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png'
   'http://localhost:3000/data.png'  
 const MNIST_LABELS_PATH =
   'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8'
@@ -63,8 +61,8 @@ export class MnistData {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
           for (let j = 0; j < imageData.data.length / 4; j++) {
-            // All channels hold an equal value since the image is grayscale, so
-            // just read the red channel.
+            // currently just handling single channel
+            // just read the red.
             datasetBytesView[j] = imageData.data[j * 4] / 255
           }
         }

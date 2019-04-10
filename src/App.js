@@ -8,8 +8,8 @@ import * as tfvis from '@tensorflow/tfjs-vis'
 function getModel() {
   const model = tf.sequential()
 
-  const IMAGE_WIDTH = 28
-  const IMAGE_HEIGHT = 28
+  const IMAGE_WIDTH = 64
+  const IMAGE_HEIGHT = 64
   const IMAGE_CHANNELS = 1
 
   // In the first layer of out convolutional neural network we have
@@ -48,9 +48,9 @@ function getModel() {
   // higher dimensional data to a final classification output layer.
   model.add(tf.layers.flatten())
 
-  // Our last layer is a dense layer which has 10 output units, one for each
-  // output class (i.e. 0, 1, 2, 3, 4, 5, 6, 7, 8, 9).
-  const NUM_OUTPUT_CLASSES = 10
+  // Our last layer is a dense layer which has 3 output units, one for each
+  // output class (i.e. 0, 1, 2).
+  const NUM_OUTPUT_CLASSES = 3
   model.add(
     tf.layers.dense({
       units: NUM_OUTPUT_CLASSES,
@@ -80,17 +80,17 @@ async function train(model, data) {
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics)
 
   const BATCH_SIZE = 512
-  const TRAIN_DATA_SIZE = 5500
-  const TEST_DATA_SIZE = 1000
+  const TRAIN_DATA_SIZE = 2100
+  const TEST_DATA_SIZE = 420
 
   const [trainXs, trainYs] = tf.tidy(() => {
     const d = data.nextTrainBatch(TRAIN_DATA_SIZE)
-    return [d.xs.reshape([TRAIN_DATA_SIZE, 28, 28, 1]), d.labels]
+    return [d.xs.reshape([TRAIN_DATA_SIZE, 64, 64, 1]), d.labels]
   })
 
   const [testXs, testYs] = tf.tidy(() => {
     const d = data.nextTestBatch(TEST_DATA_SIZE)
-    return [d.xs.reshape([TEST_DATA_SIZE, 28, 28, 1]), d.labels]
+    return [d.xs.reshape([TEST_DATA_SIZE, 64, 64, 1]), d.labels]
   })
 
   return model.fit(trainXs, trainYs, {
@@ -115,15 +115,15 @@ async function showExamples(data) {
   // Create a canvas element to render each example
   for (let i = 0; i < numExamples; i++) {
     const imageTensor = tf.tidy(() => {
-      // Reshape the image to 28x28 px
+      // Reshape the image to 64x64 px
       return examples.xs
         .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([28, 28, 1])
+        .reshape([64, 64, 1])
     })
 
     const canvas = document.createElement('canvas')
-    canvas.width = 28
-    canvas.height = 28
+    canvas.width = 64
+    canvas.height = 64
     canvas.style = 'margin: 4px;'
     await tf.browser.toPixels(imageTensor, canvas)
     surface.drawArea.appendChild(canvas)
@@ -133,21 +133,14 @@ async function showExamples(data) {
 }
 
 const classNames = [
-  'Zero',
-  'One',
-  'Two',
-  'Three',
-  'Four',
-  'Five',
-  'Six',
-  'Seven',
-  'Eight',
-  'Nine'
+  'Rock',
+  'Paper',
+  'Scissors'
 ]
 
-function doPrediction(model, data, testDataSize = 500) {
-  const IMAGE_WIDTH = 28
-  const IMAGE_HEIGHT = 28
+function doPrediction(model, data, testDataSize = 420) {
+  const IMAGE_WIDTH = 64
+  const IMAGE_HEIGHT = 64
   const testData = data.nextTestBatch(testDataSize)
   const testxs = testData.xs.reshape([
     testDataSize,
