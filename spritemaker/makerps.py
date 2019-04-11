@@ -49,13 +49,13 @@ one_hot_y = []
 for idx in p:
     # build master sprite 1 pixel down at a time
     new_im.paste(x_data[idx], (0, y_offset))
-    y_offset += 1
+
     # build 1-hot encoded answer key
-    if shuffled_y[idx] == 1:
+    if shuffled_y[y_offset] == 1:
         one_hot_y.append(1)
         one_hot_y.append(0)
         one_hot_y.append(0)
-    elif shuffled_y[idx] == 2:
+    elif shuffled_y[y_offset] == 2:
         one_hot_y.append(0)
         one_hot_y.append(1)
         one_hot_y.append(0)
@@ -63,6 +63,8 @@ for idx in p:
         one_hot_y.append(0)
         one_hot_y.append(0)
         one_hot_y.append(1)
+    # NEEEEXXXXXXT
+    y_offset += 1        
 
 
 # Save answers file (Y)
@@ -72,8 +74,10 @@ bytesWritte = newFile.write(newFileByteArray)
 # should be num classes * original answer key size
 assert bytesWritte == (3 * len(y_data))
 
-
-
 # Save Data Sprite (X)
 new_im.save('data.png')
-# new_im.show() # For debugging
+
+# Good ol Debugging Stuff
+# new_im.show() 
+# print(str(shuffled_y))
+# print(str(one_hot_y))

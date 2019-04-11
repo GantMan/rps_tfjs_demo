@@ -10,12 +10,12 @@ const TRAIN_TEST_RATIO = 5 / 6
 const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
-const MNIST_IMAGES_SPRITE_PATH =
+const RPS_IMAGES_SPRITE_PATH =
   'http://localhost:3000/data.png'  
-const MNIST_LABELS_PATH =
+const RPS_LABELS_PATH =
   'http://localhost:3000/labels_uint8'
 
-export class MnistData {
+export class RPSDataset {
   constructor() {
     this.shuffledTrainIndex = 0
     this.shuffledTestIndex = 0
@@ -26,7 +26,7 @@ export class MnistData {
     const img = new Image()
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    const imgRequest = new Promise((resolve, reject) => {
+    const imgRequest = new Promise((resolve, _reject) => {
       img.crossOrigin = ''
       img.onload = () => {
         img.width = img.naturalWidth
@@ -70,10 +70,10 @@ export class MnistData {
 
         resolve()
       }
-      img.src = MNIST_IMAGES_SPRITE_PATH
+      img.src = RPS_IMAGES_SPRITE_PATH
     })
 
-    const labelsRequest = fetch(MNIST_LABELS_PATH)
+    const labelsRequest = fetch(RPS_LABELS_PATH)
     const [_imgResponse, labelsResponse] = await Promise.all([
       imgRequest,
       labelsRequest
@@ -110,6 +110,7 @@ export class MnistData {
         this.shuffledTrainIndex =
           (this.shuffledTrainIndex + 1) % this.trainIndices.length
         return this.trainIndices[this.shuffledTrainIndex]
+        // return this.shuffledTrainIndex // For debugging, no rando
       }
     )
   }
@@ -119,6 +120,7 @@ export class MnistData {
       this.shuffledTestIndex =
         (this.shuffledTestIndex + 1) % this.testIndices.length
       return this.testIndices[this.shuffledTestIndex]
+      // return this.shuffledTestIndex // For debugging, no rando
     })
   }
 
@@ -144,7 +146,7 @@ export class MnistData {
 
     const xs = tf.tensor2d(batchImagesArray, [batchSize, IMAGE_SIZE])
     const labels = tf.tensor2d(batchLabelsArray, [batchSize, NUM_CLASSES])
-
+    // console.log(batchLabelsArray)
     return { xs, labels }
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { MnistData } from './data.js'
+import { RPSDataset } from './data.js'
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
@@ -179,7 +179,7 @@ async function train(model, data) {
   return model.fit(trainXs, trainYs, {
     batchSize: BATCH_SIZE,
     validationData: [testXs, testYs],
-    epochs: 10,
+    epochs: 20,
     shuffle: true,
     callbacks: fitCallbacks
   })
@@ -261,24 +261,19 @@ async function showConfusion(model, data) {
 }
 
 class App extends Component {
-  async componentDidMount() {
-    // const data = new MnistData()
-    // await data.load()
-    // await showExamples(data)
-    // train n stuff
-    // const model = getSimpleModel()
-    // tfvis.show.modelSummary({ name: 'Model Architecture' }, model)
-    // await train(model, data)
-    // show results
-    // await showAccuracy(model, data)
-    // await showConfusion(model, data)
-  }
-
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
+          <a
+            className="App-link"
+            href="https://infinite.red"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Infinite Red
+          </a>
           <a
             className="App-link"
             href="http://gantlaborde.com/"
@@ -290,7 +285,7 @@ class App extends Component {
           <hr />
           <button
             onClick={async () => {
-              const data = new MnistData()
+              const data = new RPSDataset()
               this.data = data
               await data.load()
               await showExamples(data)
