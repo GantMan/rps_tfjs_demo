@@ -1,54 +1,32 @@
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-// Gant ADD
 import * as tf from '@tensorflow/tfjs'
 
-const IMAGE_SIZE = 784
-const NUM_CLASSES = 10
-const NUM_DATASET_ELEMENTS = 65000
+// 64x64
+const IMAGE_SIZE = 4096
+const NUM_CLASSES = 3
+const NUM_DATASET_ELEMENTS = 2520
 
 const TRAIN_TEST_RATIO = 5 / 6
 
 const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
-const MNIST_IMAGES_SPRITE_PATH =
-  'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png'
-const MNIST_LABELS_PATH =
-  'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8'
+const RPS_IMAGES_SPRITE_PATH =
+  'http://localhost:3000/data.png'  
+const RPS_LABELS_PATH =
+  'http://localhost:3000/labels_uint8'
 
-/**
- * A class that fetches the sprited MNIST dataset and returns shuffled batches.
- *
- * NOTE: This will get much easier. For now, we do data fetching and
- * manipulation manually.
- */
-export class MnistData {
+export class RPSDataset {
   constructor() {
     this.shuffledTrainIndex = 0
     this.shuffledTestIndex = 0
   }
 
   async load() {
-    // Make a request for the MNIST sprited image.
+    // Make a request for the RPS sprited image.
     const img = new Image()
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    const imgRequest = new Promise((resolve, reject) => {
+    const imgRequest = new Promise((resolve, _reject) => {
       img.crossOrigin = ''
       img.onload = () => {
         img.width = img.naturalWidth
@@ -58,7 +36,7 @@ export class MnistData {
           NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
         )
 
-        const chunkSize = 5000
+        const chunkSize = 60
         canvas.width = img.width
         canvas.height = chunkSize
 
@@ -83,8 +61,8 @@ export class MnistData {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
           for (let j = 0; j < imageData.data.length / 4; j++) {
-            // All channels hold an equal value since the image is grayscale, so
-            // just read the red channel.
+            // currently just handling single channel
+            // just read the red.
             datasetBytesView[j] = imageData.data[j * 4] / 255
           }
         }
@@ -92,11 +70,11 @@ export class MnistData {
 
         resolve()
       }
-      img.src = MNIST_IMAGES_SPRITE_PATH
+      img.src = RPS_IMAGES_SPRITE_PATH
     })
 
-    const labelsRequest = fetch(MNIST_LABELS_PATH)
-    const [imgResponse, labelsResponse] = await Promise.all([
+    const labelsRequest = fetch(RPS_LABELS_PATH)
+    const [_imgResponse, labelsResponse] = await Promise.all([
       imgRequest,
       labelsRequest
     ])
@@ -109,6 +87,9 @@ export class MnistData {
     this.testIndices = tf.util.createShuffledIndices(NUM_TEST_ELEMENTS)
 
     // Slice the the images and labels into train and test sets.
+    // This style of slicing hopes that they have been RANDOMIZED BEFORE
+    // they show up here.  Otherwise your test set might be all the same class
+    // UGH!
     this.trainImages = this.datasetImages.slice(
       0,
       IMAGE_SIZE * NUM_TRAIN_ELEMENTS
@@ -129,6 +110,7 @@ export class MnistData {
         this.shuffledTrainIndex =
           (this.shuffledTrainIndex + 1) % this.trainIndices.length
         return this.trainIndices[this.shuffledTrainIndex]
+        // return this.shuffledTrainIndex // For debugging, no rando
       }
     )
   }
@@ -138,6 +120,7 @@ export class MnistData {
       this.shuffledTestIndex =
         (this.shuffledTestIndex + 1) % this.testIndices.length
       return this.testIndices[this.shuffledTestIndex]
+      // return this.shuffledTestIndex // For debugging, no rando
     })
   }
 
@@ -163,7 +146,7 @@ export class MnistData {
 
     const xs = tf.tensor2d(batchImagesArray, [batchSize, IMAGE_SIZE])
     const labels = tf.tensor2d(batchLabelsArray, [batchSize, NUM_CLASSES])
-
+    // console.log(batchLabelsArray)
     return { xs, labels }
   }
 }
