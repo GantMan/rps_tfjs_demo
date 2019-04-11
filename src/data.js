@@ -13,7 +13,7 @@ const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 const MNIST_IMAGES_SPRITE_PATH =
   'http://localhost:3000/data.png'  
 const MNIST_LABELS_PATH =
-  'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8'
+  'http://localhost:3000/labels_uint8'
 
 export class MnistData {
   constructor() {
@@ -74,7 +74,7 @@ export class MnistData {
     })
 
     const labelsRequest = fetch(MNIST_LABELS_PATH)
-    const [imgResponse, labelsResponse] = await Promise.all([
+    const [_imgResponse, labelsResponse] = await Promise.all([
       imgRequest,
       labelsRequest
     ])
@@ -87,6 +87,9 @@ export class MnistData {
     this.testIndices = tf.util.createShuffledIndices(NUM_TEST_ELEMENTS)
 
     // Slice the the images and labels into train and test sets.
+    // This style of slicing hopes that they have been RANDOMIZED BEFORE
+    // they show up here.  Otherwise your test set might be all the same class
+    // UGH!
     this.trainImages = this.datasetImages.slice(
       0,
       IMAGE_SIZE * NUM_TRAIN_ELEMENTS
