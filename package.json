@@ -1,7 +1,12 @@
 {
-  "name": "nsfw_tfjs_model",
+  "name": "tfjs_demo",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Gant Laborde",
+    "url": "http://gantlaborde.com"
+  },
+  "description": "Awesome TFJS Demo with RPS",
   "dependencies": {
     "@tensorflow/tfjs": "^1.0.4",
     "@tensorflow/tfjs-vis": "^1.0.3",
