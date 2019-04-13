@@ -21,11 +21,12 @@ const doPrediction = (model, data, testDataSize = 420) => {
   return [preds, labels]
 }
 
-export const showAccuracy = async (model, data) => {
+export const showAccuracy = async (model, data, title = 'Accuracy') => {
   const [preds, labels] = doPrediction(model, data)
   const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds)
-  const container = { name: 'Accuracy', tab: 'Evaluation' }
+  const container = { name: title, tab: 'Evaluation' }
   tfvis.show.perClassAccuracy(container, classAccuracy, classNames)
+  tfvis.visor().setActiveTab('Evaluation')
 
   labels.dispose()
 }
@@ -60,15 +61,15 @@ export const showExamples = async data => {
   // Create a canvas element to render each example
   for (let i = 0; i < numExamples; i++) {
     const imageTensor = tf.tidy(() => {
-      // Reshape the image to 64x64 px
+      // Reshape the image to widt*height px
       return examples.xs
         .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([64, 64, 1])
+        .reshape([IMAGE_WIDTH, IMAGE_HEIGHT, 1])
     })
 
     const canvas = document.createElement('canvas')
-    canvas.width = 64
-    canvas.height = 64
+    canvas.width = IMAGE_WIDTH
+    canvas.height = IMAGE_HEIGHT
     canvas.style = 'margin: 4px;'
     await tf.browser.toPixels(imageTensor, canvas)
     surface.drawArea.appendChild(canvas)

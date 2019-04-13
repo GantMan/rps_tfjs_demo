@@ -10,10 +10,8 @@ const TRAIN_TEST_RATIO = 5 / 6
 const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
-const RPS_IMAGES_SPRITE_PATH =
-  'http://localhost:3000/data.png'  
-const RPS_LABELS_PATH =
-  'http://localhost:3000/labels_uint8'
+const RPS_IMAGES_SPRITE_PATH = 'http://localhost:3000/data.png'
+const RPS_LABELS_PATH = 'http://localhost:3000/labels_uint8'
 
 export class RPSDataset {
   constructor() {

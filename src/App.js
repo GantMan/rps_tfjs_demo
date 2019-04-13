@@ -3,44 +3,13 @@ import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
 import { getAdvancedModel, getSimpleModel } from './tfjs/models.js'
+import { train } from './tfjs/train.js'
 import {
   showAccuracy,
   showConfusion,
   showExamples
 } from './tfjs/evaluationHelpers.js'
-import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
-
-async function train(model, data, numEpochs = 10) {
-  const metrics = ['loss', 'acc', 'val_acc']
-  const container = {
-    name: 'Model Training',
-    styles: { height: '1000px' }
-  }
-  const fitCallbacks = tfvis.show.fitCallbacks(container, metrics)
-
-  const BATCH_SIZE = 512
-  const TRAIN_DATA_SIZE = 2100
-  const TEST_DATA_SIZE = 420
-
-  const [trainXs, trainYs] = tf.tidy(() => {
-    const d = data.nextTrainBatch(TRAIN_DATA_SIZE)
-    return [d.xs.reshape([TRAIN_DATA_SIZE, 64, 64, 1]), d.labels]
-  })
-
-  const [testXs, testYs] = tf.tidy(() => {
-    const d = data.nextTestBatch(TEST_DATA_SIZE)
-    return [d.xs.reshape([TEST_DATA_SIZE, 64, 64, 1]), d.labels]
-  })
-
-  return model.fit(trainXs, trainYs, {
-    batchSize: BATCH_SIZE,
-    validationData: [testXs, testYs],
-    epochs: numEpochs,
-    shuffle: true,
-    callbacks: fitCallbacks
-  })
-}
 
 class App extends Component {
   state = {
@@ -73,11 +42,12 @@ class App extends Component {
         </header>
         <div class="Main">
           <p>
-            We'll be working with a fun dataset for the classic game Rock Paper
-            Scissors, provided here:{' '}
+            We'll be working with a fun dataset for the classic game, "Rock
+            Paper Scissors", provided here:{' '}
             <a
               href="http://www.laurencemoroney.com/rock-paper-scissors-dataset/"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Rock Paper Scissors Dataset
             </a>
@@ -98,7 +68,14 @@ class App extends Component {
           >
             Load and Show Examples
           </button>
-          <p>PLACEHOLDER</p>
+          <p>
+            Each of the examples have been loaded now. Due to this being a
+            browser, the data is loaded with one{' '}
+            <a href="./data.png" target="_blank" rel="noopener noreferrer">
+              sprite-sheet
+            </a>{' '}
+            to get around sandboxing.
+          </p>
           <div class="GroupUp">
             <button
               class="myButton"
@@ -129,7 +106,10 @@ class App extends Component {
               Create Advanced Model
             </button>
           </div>
-          <p>PLACEHOLDER</p>
+          <p>
+            Creating a model, is the structure and blueprint. It starts off able
+            to, but terrible at predicting.
+          </p>
           <button
             class="myButton"
             onClick={async () => {
@@ -139,7 +119,10 @@ class App extends Component {
           >
             Check Untrained Model Results
           </button>
-          <p>Train your Model</p>
+          <p>
+            Train your Model with your training data. In this case 2100 labeled
+            images, over and over... but not <em>toooooo much.</em>
+          </p>
           <button
             class="myButton"
             onClick={async () => {
@@ -149,18 +132,104 @@ class App extends Component {
           >
             Train Your {this.state.currentModel} Model
           </button>
-          <p>PLACEHOLDER</p>
+          <p>
+            Now that our model has seen some stuff{' '}
+            <span role="img" aria-label="woah">
+              😳
+            </span>
+            <hr />
+            It should be smarter at identifying RPS! We can now test it with 420
+            RPS images it's never seen before.
+          </p>
           <button
             class="myButton"
             onClick={async () => {
-              await showAccuracy(this.model, this.data)
-              await showConfusion(this.model, this.data)
+              await showAccuracy(this.model, this.data, 'Trained Accuracy')
+              await showConfusion(
+                this.model,
+                this.data,
+                'Trained Confusion Matrix'
+              )
             }}
           >
             Check Model After Training
           </button>
+          <p>
+            We can now save our trained model! We can store it via downloading
+            it, uploading it, or place the results in localstorage for access of
+            the browser.
+          </p>
+          <p>
+            The simple model size comes out to about 48Kb, but some models can
+            be as large as 20+MBs! It depends how simple you keep the model. If
+            you want the model trained above, you get two files by{' '}
+            <a
+              class="pointy"
+              onClick={async () =>
+                await this.model.save('downloads://rps-model')
+              }
+            >
+              clicking here
+            </a>
+            . The <span class="cod">model.json</span> file demonstrates the
+            structure of the model, and the weights are our non-random trained
+            values that make the model accurate.
+          </p>
         </div>
-        <img src={gant} class="wiggle" />
+        <div class="GroupUp">
+          <img src={gant} class="wiggle me" alt="Gant Laborde" />
+          <ul id="footer">
+            <li>
+              Website:{' '}
+              <a
+                href="http://gantlaborde.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GantLaborde.com
+              </a>
+            </li>
+            <li>
+              Twitter:{' '}
+              <a
+                href="https://twitter.com/gantlaborde"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                @GantLaborde
+              </a>
+            </li>
+            <li>
+              Medium:{' '}
+              <a
+                href="https://medium.freecodecamp.org/@gantlaborde"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GantLaborde
+              </a>
+            </li>
+            <li>
+              GitHub:{' '}
+              <a
+                href="https://github.com/GantMan"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GantMan
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://infinite.red"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src="./ir.svg" id="InfiniteRed" alt="Infinite Red" />
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     )
   }

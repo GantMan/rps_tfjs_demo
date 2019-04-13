@@ -43,6 +43,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .Main {
@@ -52,7 +53,8 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: calc(10px + 1vmin);
+  font-size: calc(14px + 1vmin);
+  padding: 5px 20px 40px 20px;
 }
 
 .Main a {
@@ -61,6 +63,17 @@
 
 .Main a:visited {
   color: #3b93ffcb;
+}
+
+.pointy {
+  cursor: pointer;
+}
+
+.cod {
+  font-family: 'Courier New', Courier, monospace;
+  padding: 0 5px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .myButton {
@@ -114,6 +127,22 @@
 .myButton:active {
   position: relative;
   top: 1px;
+}
+
+.me {
+  max-height: 200px;
+}
+
+#footer {
+  list-style-type: none;
+}
+
+#footer li a {
+  color: red;
+}
+
+#InfiniteRed {
+  padding-top: 20px;
 }
 
 @keyframes App-logo-spin {
