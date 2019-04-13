@@ -4,7 +4,7 @@ const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 const IMAGE_CHANNELS = 1
 
-export const getBetterModel = () => {
+export const getAdvancedModel = () => {
   const model = tf.sequential()
 
   model.add(
@@ -39,7 +39,7 @@ export const getBetterModel = () => {
   model.add(tf.layers.dropout({ rate: 0.25 }))
 
   // Now we flatten the output from the 2D filters into a 1D vector to prepare
-  // it for input into our last layer. 
+  // it for input into our last layer.
   model.add(tf.layers.flatten())
 
   // complex dense intermediate
@@ -74,8 +74,7 @@ export const getBetterModel = () => {
   return model
 }
 
-
-// The classic MNIST style model 
+// The classic MNIST style model
 export const getSimpleModel = () => {
   const model = tf.sequential()
 

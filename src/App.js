@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
 import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
-import { getBetterModel, getSimpleModel } from './tfjs/models.js'
+import { getAdvancedModel, getSimpleModel } from './tfjs/models.js'
 import {
   showAccuracy,
   showConfusion,
@@ -12,7 +11,7 @@ import {
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
-async function train(model, data) {
+async function train(model, data, numEpochs = 10) {
   const metrics = ['loss', 'acc', 'val_acc']
   const container = {
     name: 'Model Training',
@@ -37,13 +36,17 @@ async function train(model, data) {
   return model.fit(trainXs, trainYs, {
     batchSize: BATCH_SIZE,
     validationData: [testXs, testYs],
-    epochs: 20,
+    epochs: numEpochs,
     shuffle: true,
     callbacks: fitCallbacks
   })
 }
 
 class App extends Component {
+  state = {
+    currentModel: null
+  }
+
   render() {
     return (
       <div className="App">
@@ -100,6 +103,7 @@ class App extends Component {
             <button
               class="myButton"
               onClick={async () => {
+                this.setState({ currentModel: 'Simple' })
                 const model = getSimpleModel()
                 tfvis.show.modelSummary(
                   { name: 'Simple Model Architecture' },
@@ -113,7 +117,8 @@ class App extends Component {
             <button
               class="myButton"
               onClick={async () => {
-                const model = getBetterModel()
+                this.setState({ currentModel: 'Advanced' })
+                const model = getAdvancedModel()
                 tfvis.show.modelSummary(
                   { name: 'Advanced Model Architecture' },
                   model
@@ -129,19 +134,20 @@ class App extends Component {
             class="myButton"
             onClick={async () => {
               await showAccuracy(this.model, this.data)
-              await showConfusion(this.model, this.data)
+              await showConfusion(this.model, this.data, 'Untrained Matrix')
             }}
           >
-            Check Untrained Model
+            Check Untrained Model Results
           </button>
-          <p>Train Simple Model</p>
+          <p>Train your Model</p>
           <button
             class="myButton"
             onClick={async () => {
-              await train(this.model, this.data)
+              const numEpochs = this.state.currentModel === 'Simple' ? 12 : 20
+              await train(this.model, this.data, numEpochs)
             }}
           >
-            Train Your Model
+            Train Your {this.state.currentModel} Model
           </button>
           <p>PLACEHOLDER</p>
           <button
