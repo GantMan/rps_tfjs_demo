@@ -4,7 +4,11 @@ import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
 import { getBetterModel, getSimpleModel } from './tfjs/models.js'
-import { showAccuracy, showConfusion, showExamples } from './tfjs/evaluationHelpers.js'
+import {
+  showAccuracy,
+  showConfusion,
+  showExamples
+} from './tfjs/evaluationHelpers.js'
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
@@ -44,7 +48,9 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+          <h2>Rock Paper Scissors</h2>
+          <h3>Machine Learning in the browser with TFJS</h3>
+          <img src="./rps_circle.png" className="App-logo" alt="logo" />
           <a
             className="App-link"
             href="https://infinite.red"
@@ -61,15 +67,22 @@ class App extends Component {
           >
             Gant Laborde
           </a>
-          <hr />
         </header>
         <div class="Main">
           <p>
-            We'll be working with a fun dataset for the classic game Rock Paper Scissors, provided 
-            here: <a href="http://www.laurencemoroney.com/rock-paper-scissors-dataset/" target="_blank">Rock Paper Scissors Dataset</a>
+            We'll be working with a fun dataset for the classic game Rock Paper
+            Scissors, provided here:{' '}
+            <a
+              href="http://www.laurencemoroney.com/rock-paper-scissors-dataset/"
+              target="_blank"
+            >
+              Rock Paper Scissors Dataset
+            </a>
           </p>
+          <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
           <p>
-            We'll show progress in the TensorflowJS Vis panel.  You'll see it when you click the load and show button below.
+            We'll show progress in the TensorflowJS Vis panel. You'll see it
+            when you click the load and show button below.
           </p>
           <button
             class="myButton"
@@ -82,27 +95,36 @@ class App extends Component {
           >
             Load and Show Examples
           </button>
-
-          <button
-            class="myButton"
-            onClick={async () => {
-              const model = getBetterModel()
-              tfvis.show.modelSummary({ name: 'Model Architecture' }, model)
-              this.model = model
-            }}
-          >
-            Create Model
-          </button>
-
-          <button
-            class="myButton"
-            onClick={async () => {
-              await train(this.model, this.data)
-            }}
-          >
-            Train
-          </button>
-
+          <p>PLACEHOLDER</p>
+          <div class="GroupUp">
+            <button
+              class="myButton"
+              onClick={async () => {
+                const model = getSimpleModel()
+                tfvis.show.modelSummary(
+                  { name: 'Simple Model Architecture' },
+                  model
+                )
+                this.model = model
+              }}
+            >
+              Create Simple Model
+            </button>
+            <button
+              class="myButton"
+              onClick={async () => {
+                const model = getBetterModel()
+                tfvis.show.modelSummary(
+                  { name: 'Advanced Model Architecture' },
+                  model
+                )
+                this.model = model
+              }}
+            >
+              Create Advanced Model
+            </button>
+          </div>
+          <p>PLACEHOLDER</p>
           <button
             class="myButton"
             onClick={async () => {
@@ -110,10 +132,29 @@ class App extends Component {
               await showConfusion(this.model, this.data)
             }}
           >
-            Check
+            Check Untrained Model
+          </button>
+          <p>Train Simple Model</p>
+          <button
+            class="myButton"
+            onClick={async () => {
+              await train(this.model, this.data)
+            }}
+          >
+            Train Your Model
+          </button>
+          <p>PLACEHOLDER</p>
+          <button
+            class="myButton"
+            onClick={async () => {
+              await showAccuracy(this.model, this.data)
+              await showConfusion(this.model, this.data)
+            }}
+          >
+            Check Model After Training
           </button>
         </div>
-        <img src={gant}/>
+        <img src={gant} class="wiggle" />
       </div>
     )
   }
