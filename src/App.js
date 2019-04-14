@@ -18,7 +18,8 @@ const DETECTION_PERIOD = 2000
 class App extends Component {
   state = {
     currentModel: null,
-    webcamActive: false
+    webcamActive: false,
+    camMessage: ''
   }
 
   _renderWebcam = () => {
@@ -37,7 +38,12 @@ class App extends Component {
     // assure video is still shown
     if (video[0]) {
       const predictions = await doSinglePrediction(this.model, video[0])
+      console.log(predictions)
+      const camMessage = predictions
+        .map(p => ` ${p.className}: %${(p.probability * 100).toFixed(2)}`)
+        .toString()
       //setstate here
+      this.setState({ camMessage })
       setTimeout(this.detectWebcam, DETECTION_PERIOD)
     }
   }
@@ -85,7 +91,9 @@ class App extends Component {
           <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
           <p>
             We'll show progress in the TensorflowJS Vis panel. You'll see it
-            when you click the load and show button below.
+            when you click the load and show button below. Press{' '}
+            <span className="cod">`</span> or <span className="cod">~</span> key
+            to hide this menu.
           </p>
           <button
             className="myButton"
@@ -115,9 +123,22 @@ class App extends Component {
             </a>
             .
           </p>
+          <p>
+            You now create the structure for the data, that hopefully works
+            best.{' '}
+            <strong>
+              In this situation, an advanced model is a bad choice.
+            </strong>{' '}
+            An advanced model will train slower while overfitting this small and
+            simple training data.
+          </p>
           <div className="GroupUp">
             <button
-              className="myButton"
+              className={
+                this.state.currentModel === 'Simple'
+                  ? 'myButton activeModel'
+                  : 'myButton'
+              }
               onClick={async () => {
                 this.setState({ currentModel: 'Simple' })
                 const model = getSimpleModel()
@@ -131,7 +152,11 @@ class App extends Component {
               Create Simple Model
             </button>
             <button
-              className="myButton"
+              className={
+                this.state.currentModel === 'Advanced'
+                  ? 'myButton activeModel'
+                  : 'myButton'
+              }
               onClick={async () => {
                 this.setState({ currentModel: 'Advanced' })
                 const model = getAdvancedModel()
@@ -225,6 +250,16 @@ class App extends Component {
             values that make the model accurate.
           </p>
           <h3>Now let's see if we can test our model with the real world!</h3>
+          <img src="./rps_webcam_big.jpg" className="demo" />
+          <p>
+            Keep in mind, the training data for this model had no background,
+            and the model itself isn't practiced in dealing with noise and
+            rotation. A more advanced model would do better, but for this demo
+            you shouldn't have any problems getting consistent and accurate
+            results. When testing on a webcam, you'll need to make the images as
+            clean as you can. Every few seconds your webcam image will be
+            converted to a 64x64 grayscale image for your model to classify.
+          </p>
           <button
             className="myButton"
             onClick={async () => {
@@ -232,7 +267,8 @@ class App extends Component {
               if (!this.model) return
               this.setState(
                 prevState => ({
-                  webcamActive: !prevState.webcamActive
+                  webcamActive: !prevState.webcamActive,
+                  camMessage: ''
                 }),
                 this.detectWebcam
               )
@@ -240,7 +276,24 @@ class App extends Component {
           >
             {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
           </button>
+          {this.state.camMessage}
           {this._renderWebcam()}
+        </div>
+        <div className="GroupUp">
+          <p style={{ width: '70%' }}>
+            You just trained a Machine Learning model directly in your browser!
+            For a much more robust model example, please see{' '}
+            <a
+              href="https://nsfwjs.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              NSFWJS.com
+            </a>
+            . Follow me and Infinite Red for cool new experiments, and let us
+            know what cool things you've come up with!{' '}
+            <em>We can help, we're available for AI consulting!</em>
+          </p>
         </div>
         <div className="GroupUp">
           <img src={gant} className="wiggle me" alt="Gant Laborde" />
@@ -273,6 +326,16 @@ class App extends Component {
                 rel="noopener noreferrer"
               >
                 GantLaborde
+              </a>
+            </li>
+            <li>
+              ML Twitter:{' '}
+              <a
+                href="https://twitter.com/FunMachineLearn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                FunMachineLearn
               </a>
             </li>
             <li>

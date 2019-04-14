@@ -30,8 +30,13 @@ export const doSinglePrediction = async (model, img) => {
   })
 
   const values = await logits.data()
-  // Now get class
-  console.log(values)
+  // cleanup logits
+  logits.dispose()
+  // return class + prediction of all
+  return classNames.map((className, idx) => ({
+    className,
+    probability: values[idx]
+  }))
 }
 
 const doPrediction = (model, data, testDataSize = 420) => {
