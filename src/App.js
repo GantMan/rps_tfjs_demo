@@ -74,7 +74,8 @@ class App extends Component {
             <a href="./data.png" target="_blank" rel="noopener noreferrer">
               sprite-sheet
             </a>{' '}
-            to get around sandboxing.
+            to get around sandboxing. My code to create sprite-sheets is
+            available with this repo on GitHub.
           </p>
           <div class="GroupUp">
             <button
@@ -113,6 +114,9 @@ class App extends Component {
           <button
             class="myButton"
             onClick={async () => {
+              // stop errors
+              if (!this.data) return
+              if (!this.model) return
               await showAccuracy(this.model, this.data)
               await showConfusion(this.model, this.data, 'Untrained Matrix')
             }}
@@ -126,6 +130,9 @@ class App extends Component {
           <button
             class="myButton"
             onClick={async () => {
+              // stop errors
+              if (!this.data) return
+              if (!this.model) return
               const numEpochs = this.state.currentModel === 'Simple' ? 12 : 20
               await train(this.model, this.data, numEpochs)
             }}
@@ -144,6 +151,9 @@ class App extends Component {
           <button
             class="myButton"
             onClick={async () => {
+              // stop errors
+              if (!this.data) return
+              if (!this.model) return
               await showAccuracy(this.model, this.data, 'Trained Accuracy')
               await showConfusion(
                 this.model,
