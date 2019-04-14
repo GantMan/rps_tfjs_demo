@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Webcam from 'react-webcam'
 import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
@@ -7,13 +8,42 @@ import { train } from './tfjs/train.js'
 import {
   showAccuracy,
   showConfusion,
-  showExamples
+  showExamples,
+  doSinglePrediction
 } from './tfjs/evaluationHelpers.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
+const DETECTION_PERIOD = 2000
+
 class App extends Component {
   state = {
-    currentModel: null
+    currentModel: null,
+    webcamActive: false
+  }
+
+  _renderWebcam = () => {
+    if (this.state.webcamActive) {
+      return <Webcam ref={this._refWeb} className="captureCam" />
+    }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  detectWebcam = async () => {
+    await this.sleep(100)
+    const video = document.querySelectorAll('.captureCam')
+    // assure video is still shown
+    if (video[0]) {
+      const predictions = await doSinglePrediction(this.model, video[0])
+      //setstate here
+      setTimeout(this.detectWebcam, DETECTION_PERIOD)
+    }
+  }
+
+  _refWeb = webcam => {
+    this.webcam = webcam
   }
 
   render() {
@@ -40,7 +70,7 @@ class App extends Component {
             Gant Laborde
           </a>
         </header>
-        <div class="Main">
+        <div className="Main">
           <p>
             We'll be working with a fun dataset for the classic game, "Rock
             Paper Scissors", provided here:{' '}
@@ -58,7 +88,7 @@ class App extends Component {
             when you click the load and show button below.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               const data = new RPSDataset()
               this.data = data
@@ -85,9 +115,9 @@ class App extends Component {
             </a>
             .
           </p>
-          <div class="GroupUp">
+          <div className="GroupUp">
             <button
-              class="myButton"
+              className="myButton"
               onClick={async () => {
                 this.setState({ currentModel: 'Simple' })
                 const model = getSimpleModel()
@@ -101,7 +131,7 @@ class App extends Component {
               Create Simple Model
             </button>
             <button
-              class="myButton"
+              className="myButton"
               onClick={async () => {
                 this.setState({ currentModel: 'Advanced' })
                 const model = getAdvancedModel()
@@ -120,7 +150,7 @@ class App extends Component {
             to, but terrible at predicting.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -136,7 +166,7 @@ class App extends Component {
             images, over and over... but not <em>toooooo much.</em>
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -157,7 +187,7 @@ class App extends Component {
             RPS images it's never seen before.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -182,20 +212,38 @@ class App extends Component {
             be as large as 20+MBs! It depends how simple you keep the model. If
             you want the model trained above, you get two files by{' '}
             <a
-              class="pointy"
-              onClick={async () =>
+              className="pointy"
+              onClick={async () => {
+                if (!this.model) return
                 await this.model.save('downloads://rps-model')
-              }
+              }}
             >
               clicking here
             </a>
-            . The <span class="cod">model.json</span> file demonstrates the
+            . The <span className="cod">model.json</span> file demonstrates the
             structure of the model, and the weights are our non-random trained
             values that make the model accurate.
           </p>
+          <h3>Now let's see if we can test our model with the real world!</h3>
+          <button
+            className="myButton"
+            onClick={async () => {
+              // stop errors
+              if (!this.model) return
+              this.setState(
+                prevState => ({
+                  webcamActive: !prevState.webcamActive
+                }),
+                this.detectWebcam
+              )
+            }}
+          >
+            {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
+          </button>
+          {this._renderWebcam()}
         </div>
-        <div class="GroupUp">
-          <img src={gant} class="wiggle me" alt="Gant Laborde" />
+        <div className="GroupUp">
+          <img src={gant} className="wiggle me" alt="Gant Laborde" />
           <ul id="footer">
             <li>
               Website:{' '}

@@ -6,6 +6,34 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 
+export const doSinglePrediction = async (model, img) => {
+  // First get logits
+  const logits = tf.tidy(() => {
+    img = tf.browser.fromPixels(img)
+    // Bring it down to gray
+    const gray_mid = img.mean(2)
+    const gray = gray_mid.expandDims(2) // back to (width, height, 1)
+    let resized
+    if (img.shape[0] !== IMAGE_WIDTH || img.shape[1] !== IMAGE_WIDTH) {
+      const alignCorners = true
+      resized = tf.image.resizeBilinear(
+        gray,
+        [IMAGE_WIDTH, IMAGE_HEIGHT],
+        alignCorners
+      )
+    }
+
+    // Singe-element batch
+    const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
+    // return logits
+    return model.predict(batched)
+  })
+
+  const values = await logits.data()
+  // Now get class
+  console.log(values)
+}
+
 const doPrediction = (model, data, testDataSize = 420) => {
   const testData = data.nextTestBatch(testDataSize)
   const testxs = testData.xs.reshape([
