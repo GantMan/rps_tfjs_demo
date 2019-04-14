@@ -1,3 +1,10 @@
+# Rock Paper Scissors - Browser Machine Learning
+DEMO: https://rps-tfjs.netlify.com/
+
+
+
+# Running the Project Basics
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
