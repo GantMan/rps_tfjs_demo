@@ -1,9 +1,6 @@
-# Rock Paper Scissors - Browser Machine Learning
-DEMO: https://rps-tfjs.netlify.com/
-
-
-
-# Running the Project Basics
+# Tensorflow JS - Rock Paper Scissors
+![rps header logo](./public/rps_logo.jpg)
+## DEMO: https://rps-tfjs.netlify.com/
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
