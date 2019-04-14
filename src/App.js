@@ -291,7 +291,7 @@ class App extends Component {
               NSFWJS.com
             </a>
             . Follow me and Infinite Red for cool new experiments, and let us
-            know what cool things you've come up with!{' '}
+            know what cool things you've come up with.{' '}
             <em>We can help, we're available for AI consulting!</em>
           </p>
         </div>
