@@ -75,7 +75,15 @@ class App extends Component {
               sprite-sheet
             </a>{' '}
             to get around sandboxing. My code to create sprite-sheets is
-            available with this repo on GitHub.
+            available with{' '}
+            <a
+              href="https://github.com/GantMan/rps_tfjs_demo"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              this repo on GitHub
+            </a>
+            .
           </p>
           <div class="GroupUp">
             <button
@@ -222,11 +230,11 @@ class App extends Component {
             <li>
               GitHub:{' '}
               <a
-                href="https://github.com/GantMan"
+                href="https://github.com/GantMan/rps_tfjs_demo"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GantMan
+                RPS TFJS Demo
               </a>
             </li>
             <li>
