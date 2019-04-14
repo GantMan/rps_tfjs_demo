@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Webcam from 'react-webcam'
 import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
@@ -7,13 +8,48 @@ import { train } from './tfjs/train.js'
 import {
   showAccuracy,
   showConfusion,
-  showExamples
+  showExamples,
+  doSinglePrediction
 } from './tfjs/evaluationHelpers.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
+const DETECTION_PERIOD = 2000
+
 class App extends Component {
   state = {
-    currentModel: null
+    currentModel: null,
+    webcamActive: false,
+    camMessage: ''
+  }
+
+  _renderWebcam = () => {
+    if (this.state.webcamActive) {
+      return <Webcam ref={this._refWeb} className="captureCam" />
+    }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  detectWebcam = async () => {
+    await this.sleep(100)
+    const video = document.querySelectorAll('.captureCam')
+    // assure video is still shown
+    if (video[0]) {
+      const predictions = await doSinglePrediction(this.model, video[0])
+      console.log(predictions)
+      const camMessage = predictions
+        .map(p => ` ${p.className}: %${(p.probability * 100).toFixed(2)}`)
+        .toString()
+      //setstate here
+      this.setState({ camMessage })
+      setTimeout(this.detectWebcam, DETECTION_PERIOD)
+    }
+  }
+
+  _refWeb = webcam => {
+    this.webcam = webcam
   }
 
   render() {
@@ -40,7 +76,7 @@ class App extends Component {
             Gant Laborde
           </a>
         </header>
-        <div class="Main">
+        <div className="Main">
           <p>
             We'll be working with a fun dataset for the classic game, "Rock
             Paper Scissors", provided here:{' '}
@@ -55,10 +91,12 @@ class App extends Component {
           <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
           <p>
             We'll show progress in the TensorflowJS Vis panel. You'll see it
-            when you click the load and show button below.
+            when you click the load and show button below. Press{' '}
+            <span className="cod">`</span> or <span className="cod">~</span> key
+            to hide this menu.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               const data = new RPSDataset()
               this.data = data
@@ -85,9 +123,22 @@ class App extends Component {
             </a>
             .
           </p>
-          <div class="GroupUp">
+          <p>
+            You now create the structure for the data, that hopefully works
+            best.{' '}
+            <strong>
+              In this situation, an advanced model is a bad choice.
+            </strong>{' '}
+            An advanced model will train slower while overfitting this small and
+            simple training data.
+          </p>
+          <div className="GroupUp">
             <button
-              class="myButton"
+              className={
+                this.state.currentModel === 'Simple'
+                  ? 'myButton activeModel'
+                  : 'myButton'
+              }
               onClick={async () => {
                 this.setState({ currentModel: 'Simple' })
                 const model = getSimpleModel()
@@ -101,7 +152,11 @@ class App extends Component {
               Create Simple Model
             </button>
             <button
-              class="myButton"
+              className={
+                this.state.currentModel === 'Advanced'
+                  ? 'myButton activeModel'
+                  : 'myButton'
+              }
               onClick={async () => {
                 this.setState({ currentModel: 'Advanced' })
                 const model = getAdvancedModel()
@@ -120,7 +175,7 @@ class App extends Component {
             to, but terrible at predicting.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -136,7 +191,7 @@ class App extends Component {
             images, over and over... but not <em>toooooo much.</em>
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -157,7 +212,7 @@ class App extends Component {
             RPS images it's never seen before.
           </p>
           <button
-            class="myButton"
+            className="myButton"
             onClick={async () => {
               // stop errors
               if (!this.data) return
@@ -182,20 +237,66 @@ class App extends Component {
             be as large as 20+MBs! It depends how simple you keep the model. If
             you want the model trained above, you get two files by{' '}
             <a
-              class="pointy"
-              onClick={async () =>
+              className="pointy"
+              onClick={async () => {
+                if (!this.model) return
                 await this.model.save('downloads://rps-model')
-              }
+              }}
             >
               clicking here
             </a>
-            . The <span class="cod">model.json</span> file demonstrates the
+            . The <span className="cod">model.json</span> file demonstrates the
             structure of the model, and the weights are our non-random trained
             values that make the model accurate.
           </p>
+          <h3>Now let's see if we can test our model with the real world!</h3>
+          <img src="./rps_webcam_big.jpg" className="demo" />
+          <p>
+            Keep in mind, the training data for this model had no background,
+            and the model itself isn't practiced in dealing with noise and
+            rotation. A more advanced model would do better, but for this demo
+            you shouldn't have any problems getting consistent and accurate
+            results. When testing on a webcam, you'll need to make the images as
+            clean as you can. Every few seconds your webcam image will be
+            converted to a 64x64 grayscale image for your model to classify.
+          </p>
+          <button
+            className="myButton"
+            onClick={async () => {
+              // stop errors
+              if (!this.model) return
+              this.setState(
+                prevState => ({
+                  webcamActive: !prevState.webcamActive,
+                  camMessage: ''
+                }),
+                this.detectWebcam
+              )
+            }}
+          >
+            {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
+          </button>
+          {this.state.camMessage}
+          {this._renderWebcam()}
         </div>
-        <div class="GroupUp">
-          <img src={gant} class="wiggle me" alt="Gant Laborde" />
+        <div className="GroupUp">
+          <p style={{ width: '70%' }}>
+            You just trained a Machine Learning model directly in your browser!
+            For a much more robust model example, please see{' '}
+            <a
+              href="https://nsfwjs.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              NSFWJS.com
+            </a>
+            . Follow me and Infinite Red for cool new experiments, and let us
+            know what cool things you've come up with.{' '}
+            <em>We can help, we're available for AI consulting!</em>
+          </p>
+        </div>
+        <div className="GroupUp">
+          <img src={gant} className="wiggle me" alt="Gant Laborde" />
           <ul id="footer">
             <li>
               Website:{' '}
@@ -225,6 +326,16 @@ class App extends Component {
                 rel="noopener noreferrer"
               >
                 GantLaborde
+              </a>
+            </li>
+            <li>
+              ML Twitter:{' '}
+              <a
+                href="https://twitter.com/FunMachineLearn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                FunMachineLearn
               </a>
             </li>
             <li>

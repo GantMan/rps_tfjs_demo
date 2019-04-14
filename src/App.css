@@ -1,3 +1,7 @@
+body {
+  background-color: #ccd6eb;
+}
+
 .App {
   text-align: center;
 }
@@ -11,7 +15,7 @@
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
+  animation: App-logo-spin infinite 15s linear;
   height: 20vmin;
   pointer-events: none;
   max-width: 500px;
@@ -54,7 +58,7 @@
   justify-content: center;
   color: white;
   font-size: calc(14px + 1vmin);
-  padding: 5px 20px 40px 20px;
+  padding: 5px 30px 40px 30px;
 }
 
 .Main a {
@@ -127,6 +131,15 @@
 .myButton:active {
   position: relative;
   top: 1px;
+}
+
+.activeModel {
+  border: 1px dashed yellow;
+}
+
+.demo {
+  width: 80%;
+  padding-top: 15px;
 }
 
 .me {
