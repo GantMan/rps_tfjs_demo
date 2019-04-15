@@ -74,8 +74,10 @@ export const showConfusion = async (
   const container = { name: title, tab: 'Evaluation' }
   tfvis.render.confusionMatrix(
     container,
-    { values: confusionMatrix },
-    classNames
+    { 
+        values: confusionMatrix,
+        tickLabels: classNames
+    }
   )
 
   labels.dispose()
