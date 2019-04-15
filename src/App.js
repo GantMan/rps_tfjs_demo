@@ -280,7 +280,7 @@ class App extends Component {
           {this._renderWebcam()}
         </div>
         <div className="GroupUp">
-          <p style={{ width: '70%' }}>
+          <p className="outro">
             You just trained a Machine Learning model directly in your browser!
             For a much more robust model example, please see{' '}
             <a
@@ -358,6 +358,15 @@ class App extends Component {
               </a>
             </li>
           </ul>
+        </div>
+        <div className="GroupUp">
+          <img src="./ml.png" id="closer" />
+          <h4>powered by</h4>
+          <img
+            src="./TF_FullColor_Horizontal.png"
+            id="closer"
+            style={{ paddingLeft: '-40px' }}
+          />
         </div>
       </div>
     )

@@ -3,7 +3,7 @@ body {
 }
 
 .App {
-  text-align: center;
+  text-align: left;
 }
 
 .App h2 {
@@ -150,8 +150,10 @@ body {
   list-style-type: none;
 }
 
-#footer li a {
-  color: red;
+#footer li a,
+.outro a {
+  color: #e73536;
+  font-weight: bold;
 }
 
 #InfiniteRed {
@@ -190,4 +192,21 @@ body {
   100% {
     -webkit-transform: rotate(-4deg);
   }
+}
+
+.outro {
+  width: 70%;
+}
+
+.credits {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+#closer {
+  height: 75px;
+  padding: 20px 25px 20px 0px;
 }
