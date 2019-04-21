@@ -5,9 +5,7 @@ const NUM_CLASSES = 3
 const NUM_DATASET_ELEMENTS = 2520
 // 1-4 (Red+Green+Blue+Alpha)
 const NUM_CHANNELS = 1
-
 const TRAIN_TEST_RATIO = 5 / 6
-
 const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
 
@@ -35,7 +33,7 @@ export class RPSDataset {
           NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
         )
 
-        // Chunk size cannot exceed test elements
+        // Chunk size: ratio of Test set size (tweak as needed)
         const chunkSize = Math.floor(NUM_TEST_ELEMENTS * 0.3)
         canvas.width = img.width
         canvas.height = chunkSize
@@ -61,17 +59,12 @@ export class RPSDataset {
           // RGBA of image pixels (0-255)
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-          // assign all RGBA right on over (when using all 4)
-          if (NUM_CHANNELS === 4) {
-            datasetBytesView = imageData.data
-          } else {
-            for (let j = 0; j < imageData.data.length / 4; j++) {
-              // red channel is imageData.data[j * 4] / 255
-              // green channel is imageData.data[j * 4 + 1] / 255
-              // etc.
-              for (let x = 0; x < NUM_CHANNELS; x++) {
-                datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
-              }
+          for (let j = 0; j < imageData.data.length / 4; j++) {
+            // red channel is imageData.data[j * 4] / 255
+            // green channel is imageData.data[j * 4 + 1] / 255
+            // etc.
+            for (let x = 0; x < NUM_CHANNELS; x++) {
+              datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
             }
           }
         }
