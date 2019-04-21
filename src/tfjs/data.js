@@ -1,9 +1,10 @@
 import * as tf from '@tensorflow/tfjs'
 
-// 64x64
-const IMAGE_SIZE = 4096
+const IMAGE_SIZE = 64 * 64
 const NUM_CLASSES = 3
 const NUM_DATASET_ELEMENTS = 2520
+// 1-4 (Red+Green+Blue+Alpha)
+const NUM_CHANNELS = 1
 
 const TRAIN_TEST_RATIO = 5 / 6
 
@@ -34,15 +35,16 @@ export class RPSDataset {
           NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
         )
 
+        // TODO: automate this number based on data size
         const chunkSize = 60
         canvas.width = img.width
         canvas.height = chunkSize
 
         for (let i = 0; i < NUM_DATASET_ELEMENTS / chunkSize; i++) {
           const datasetBytesView = new Float32Array(
-            datasetBytesBuffer,
-            i * IMAGE_SIZE * chunkSize * 4,
-            IMAGE_SIZE * chunkSize
+            datasetBytesBuffer, // buffer
+            i * IMAGE_SIZE * chunkSize * 4, // byteOffset * 4 because RGBA format
+            IMAGE_SIZE * chunkSize * NUM_CHANNELS // length
           )
           ctx.drawImage(
             img,
@@ -56,12 +58,22 @@ export class RPSDataset {
             chunkSize
           )
 
+          // RGBA of image pixels (0-255)
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-          for (let j = 0; j < imageData.data.length / 4; j++) {
-            // currently just handling single channel
-            // just read the red.
-            datasetBytesView[j] = imageData.data[j * 4] / 255
+          // assign all RGBA right on over (when using all 4)
+          if (NUM_CHANNELS === 4) {
+            datasetBytesView = imageData.data
+          } else {
+            for (let j = 0; j < imageData.data.length / 4; j++) {
+              // currently just handling single channel
+              // just read the red.
+              const red = imageData.data[j * 4] / 255
+              const green = imageData.data[j * 4 + 1] / 255
+              const blue = imageData.data[j * 4 + 2] / 255
+              const alpha = imageData.data[j * 4 + 3] / 255
+              datasetBytesView[j] = red
+            }
           }
         }
         this.datasetImages = new Float32Array(datasetBytesBuffer)
@@ -85,9 +97,9 @@ export class RPSDataset {
     this.testIndices = tf.util.createShuffledIndices(NUM_TEST_ELEMENTS)
 
     // Slice the the images and labels into train and test sets.
-    // This style of slicing hopes that they have been RANDOMIZED BEFORE
+    // This style of slicing hopes that they have been randomized BEFORE
     // they show up here.  Otherwise your test set might be all the same class
-    // UGH!
+    // UGH!  I guess double randomization is fine.
     this.trainImages = this.datasetImages.slice(
       0,
       IMAGE_SIZE * NUM_TRAIN_ELEMENTS
@@ -123,17 +135,21 @@ export class RPSDataset {
   }
 
   nextBatch(batchSize, data, index) {
-    const batchImagesArray = new Float32Array(batchSize * IMAGE_SIZE)
+    const batchImagesArray = new Float32Array(
+      batchSize * IMAGE_SIZE * NUM_CHANNELS
+    )
     const batchLabelsArray = new Uint8Array(batchSize * NUM_CLASSES)
 
+    // Create a batchSize of images
     for (let i = 0; i < batchSize; i++) {
       const idx = index()
 
+      const startPoint = idx * IMAGE_SIZE * NUM_CHANNELS
       const image = data[0].slice(
-        idx * IMAGE_SIZE,
-        idx * IMAGE_SIZE + IMAGE_SIZE
+        startPoint,
+        startPoint + IMAGE_SIZE * NUM_CHANNELS
       )
-      batchImagesArray.set(image, i * IMAGE_SIZE)
+      batchImagesArray.set(image, i * IMAGE_SIZE * NUM_CHANNELS)
 
       const label = data[1].slice(
         idx * NUM_CLASSES,
@@ -144,7 +160,6 @@ export class RPSDataset {
 
     const xs = tf.tensor2d(batchImagesArray, [batchSize, IMAGE_SIZE])
     const labels = tf.tensor2d(batchLabelsArray, [batchSize, NUM_CLASSES])
-    // console.log(batchLabelsArray)
     return { xs, labels }
   }
 }

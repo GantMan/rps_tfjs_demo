@@ -250,7 +250,7 @@ class App extends Component {
             values that make the model accurate.
           </p>
           <h3>Now let's see if we can test our model with the real world!</h3>
-          <img src="./rps_webcam_big.jpg" className="demo" />
+          <img src="./rps_webcam_big.jpg" className="demo" alt="webcam demo" />
           <p>
             Keep in mind, the training data for this model had no background,
             and the model itself isn't practiced in dealing with noise and
@@ -365,6 +365,7 @@ class App extends Component {
           <img
             src="./TF_FullColor_Horizontal.png"
             id="closer"
+            alt="Tensorflow logo"
             style={{ paddingLeft: '-40px' }}
           />
         </div>
