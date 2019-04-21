@@ -35,8 +35,8 @@ export class RPSDataset {
           NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
         )
 
-        // TODO: automate this number based on data size
-        const chunkSize = 60
+        // Chunk size cannot exceed test elements
+        const chunkSize = Math.floor(NUM_TEST_ELEMENTS * 0.3)
         canvas.width = img.width
         canvas.height = chunkSize
 
@@ -66,13 +66,12 @@ export class RPSDataset {
             datasetBytesView = imageData.data
           } else {
             for (let j = 0; j < imageData.data.length / 4; j++) {
-              // currently just handling single channel
-              // just read the red.
-              const red = imageData.data[j * 4] / 255
-              const green = imageData.data[j * 4 + 1] / 255
-              const blue = imageData.data[j * 4 + 2] / 255
-              const alpha = imageData.data[j * 4 + 3] / 255
-              datasetBytesView[j] = red
+              // red channel is imageData.data[j * 4] / 255
+              // green channel is imageData.data[j * 4 + 1] / 255
+              // etc.
+              for (let x = 0; x < NUM_CHANNELS; x++) {
+                datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
+              }
             }
           }
         }
