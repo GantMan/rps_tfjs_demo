@@ -1,10 +1,12 @@
 import * as tf from '@tensorflow/tfjs'
 
-const IMAGE_SIZE = 64 * 64
+const IMAGE_WIDTH = 64
+const IMAGE_HEIGHT = 64
+const IMAGE_SIZE = IMAGE_WIDTH * IMAGE_HEIGHT
 const NUM_CLASSES = 3
 const NUM_DATASET_ELEMENTS = 2520
-// 1-4 (Red+Green+Blue+Alpha)
-const NUM_CHANNELS = 1
+// 1, 3, or 4 (Red+Green+Blue+Alpha)
+const NUM_CHANNELS = 3
 const TRAIN_TEST_RATIO = 5 / 6
 const NUM_TRAIN_ELEMENTS = Math.floor(TRAIN_TEST_RATIO * NUM_DATASET_ELEMENTS)
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS
@@ -42,7 +44,7 @@ export class RPSDataset {
           const datasetBytesView = new Float32Array(
             datasetBytesBuffer, // buffer
             i * IMAGE_SIZE * chunkSize * 4, // byteOffset * 4 because RGBA format
-            IMAGE_SIZE * chunkSize * NUM_CHANNELS // length
+            IMAGE_SIZE * chunkSize * 1 // length
           )
           ctx.drawImage(
             img,

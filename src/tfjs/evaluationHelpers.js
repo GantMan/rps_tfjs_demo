@@ -5,6 +5,7 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
+const NUM_CHANNELS = 3
 
 export const doSinglePrediction = async (model, img) => {
   // First get logits
@@ -72,13 +73,10 @@ export const showConfusion = async (
   const [preds, labels] = doPrediction(model, data)
   const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds)
   const container = { name: title, tab: 'Evaluation' }
-  tfvis.render.confusionMatrix(
-    container,
-    { 
-        values: confusionMatrix,
-        tickLabels: classNames
-    }
-  )
+  tfvis.render.confusionMatrix(container, {
+    values: confusionMatrix,
+    tickLabels: classNames
+  })
 
   labels.dispose()
 }
@@ -99,7 +97,7 @@ export const showExamples = async data => {
       // Reshape the image to widt*height px
       return examples.xs
         .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([IMAGE_WIDTH, IMAGE_HEIGHT, 1])
+        .reshape([IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS])
     })
 
     const canvas = document.createElement('canvas')
