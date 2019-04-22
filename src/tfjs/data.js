@@ -34,7 +34,7 @@ export class RPSDataset {
         )
 
         // Chunk size: ratio of Test set size (tweak as needed)
-        const chunkSize = Math.floor(NUM_TEST_ELEMENTS * 0.3)
+        const chunkSize = Math.floor(NUM_TEST_ELEMENTS * 0.15)
         canvas.width = img.width
         canvas.height = chunkSize
 
@@ -64,6 +64,7 @@ export class RPSDataset {
             // green channel is imageData.data[j * 4 + 1] / 255
             // etc.
             for (let x = 0; x < NUM_CHANNELS; x++) {
+              // Divide by 255 bc Float32Array + training normalization
               datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
             }
           }
@@ -150,7 +151,11 @@ export class RPSDataset {
       batchLabelsArray.set(label, i * NUM_CLASSES)
     }
 
-    const xs = tf.tensor2d(batchImagesArray, [batchSize, IMAGE_SIZE])
+    const xs = tf.tensor3d(batchImagesArray, [
+      batchSize,
+      IMAGE_SIZE,
+      NUM_CHANNELS
+    ])
     const labels = tf.tensor2d(batchLabelsArray, [batchSize, NUM_CLASSES])
     return { xs, labels }
   }
