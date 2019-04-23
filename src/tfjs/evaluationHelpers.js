@@ -97,16 +97,19 @@ export const showExamples = async data => {
       // Reshape the image to widt*height px
       return examples.xs
         .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS])
+        .reshape([NUM_CHANNELS, IMAGE_WIDTH, IMAGE_HEIGHT])
     })
 
+    // Re-organize to be num_channels last
+    const fixedAxis = tf.transpose(imageTensor, [1, 2, 0])
     const canvas = document.createElement('canvas')
     canvas.width = IMAGE_WIDTH
     canvas.height = IMAGE_HEIGHT
     canvas.style = 'margin: 4px;'
-    await tf.browser.toPixels(imageTensor, canvas)
+    await tf.browser.toPixels(fixedAxis, canvas)
     surface.drawArea.appendChild(canvas)
 
     imageTensor.dispose()
+    fixedAxis.dispose()
   }
 }

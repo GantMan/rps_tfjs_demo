@@ -12,6 +12,7 @@ import {
   doSinglePrediction
 } from './tfjs/evaluationHelpers.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
+import * as tf from '@tensorflow/tfjs'
 
 const DETECTION_PERIOD = 2000
 
@@ -20,6 +21,23 @@ class App extends Component {
     currentModel: null,
     webcamActive: false,
     camMessage: ''
+  }
+
+  componentDidMount() {
+    /*
+    Some code for debugging, sorrrrryyyyyy where is the best place for this?
+    */
+    window.tf = tf
+    // const top = document.getElementById('logo')
+    const myCanvas = document.getElementById('myCanvas')
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = 'https://i.imgur.com/Kwxetau.jpg'
+    img.onload = async () => {
+      const imageTensor = tf.browser.fromPixels(img)
+      // console.log(imageTensor)
+      await tf.browser.toPixels(imageTensor, myCanvas)
+    }
   }
 
   _renderWebcam = () => {
@@ -58,7 +76,13 @@ class App extends Component {
         <header className="App-header">
           <h2>Rock Paper Scissors</h2>
           <h3>Machine Learning in the browser with TFJS</h3>
-          <img src="./rps_circle.png" className="App-logo" alt="logo" />
+          <img
+            src="./rps_circle.png"
+            className="App-logo"
+            alt="logo"
+            id="logo"
+          />
+          <canvas id="myCanvas" />
           <a
             className="App-link"
             href="https://infinite.red"

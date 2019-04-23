@@ -69,6 +69,7 @@ export class RPSDataset {
               // Divide by 255 bc Float32Array + training normalization
               datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
             }
+            // datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
           }
         }
         this.datasetImages = new Float32Array(datasetBytesBuffer)
