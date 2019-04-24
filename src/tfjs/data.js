@@ -31,8 +31,9 @@ export class RPSDataset {
         img.width = img.naturalWidth
         img.height = img.naturalHeight
 
+        // Every possible pixel and value
         const datasetBytesBuffer = new ArrayBuffer(
-          NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
+          NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4 * NUM_CHANNELS // * 4 because bytes
         )
 
         // Chunk size: ratio of Test set size (tweak as needed)
@@ -43,8 +44,8 @@ export class RPSDataset {
         for (let i = 0; i < NUM_DATASET_ELEMENTS / chunkSize; i++) {
           const datasetBytesView = new Float32Array(
             datasetBytesBuffer, // buffer
-            i * IMAGE_SIZE * chunkSize * 4, // byteOffset * 4 because RGBA format
-            IMAGE_SIZE * chunkSize * 1 // length
+            i * chunkSize * IMAGE_SIZE * 4, // byteOffset * 4 because RGBA format
+            IMAGE_SIZE * chunkSize * NUM_CHANNELS  // length
           )
           ctx.drawImage(
             img,
@@ -60,16 +61,9 @@ export class RPSDataset {
 
           // RGBA of image pixels (0-255)
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-
-          for (let j = 0; j < imageData.data.length / 4; j++) {
-            // red channel is imageData.data[j * 4] / 255
-            // green channel is imageData.data[j * 4 + 1] / 255
-            // etc.
-            for (let x = 0; x < NUM_CHANNELS; x++) {
-              // Divide by 255 bc Float32Array + training normalization
-              datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
-            }
-            // datasetBytesView[j + x] = imageData.data[j * 4 + x] / 255
+          let x = 0
+          for (let j = 0; j < imageData.data.length; j+=4) {
+            datasetBytesView[x++] = imageData.data[j] / 255
           }
         }
         this.datasetImages = new Float32Array(datasetBytesBuffer)
@@ -98,9 +92,9 @@ export class RPSDataset {
     // UGH!  I guess double randomization is fine.
     this.trainImages = this.datasetImages.slice(
       0,
-      IMAGE_SIZE * NUM_TRAIN_ELEMENTS
+      IMAGE_SIZE * NUM_TRAIN_ELEMENTS * NUM_CHANNELS // remove numchannels here for rainbow hands
     )
-    this.testImages = this.datasetImages.slice(IMAGE_SIZE * NUM_TRAIN_ELEMENTS)
+    this.testImages = this.datasetImages.slice(IMAGE_SIZE * NUM_TRAIN_ELEMENTS * NUM_CHANNELS)
     this.trainLabels = this.datasetLabels.slice(
       0,
       NUM_CLASSES * NUM_TRAIN_ELEMENTS
@@ -115,8 +109,8 @@ export class RPSDataset {
       () => {
         this.shuffledTrainIndex =
           (this.shuffledTrainIndex + 1) % this.trainIndices.length
-        return this.trainIndices[this.shuffledTrainIndex]
-        // return this.shuffledTrainIndex // For debugging, no rando
+        // return this.trainIndices[this.shuffledTrainIndex]
+        return this.shuffledTrainIndex // For debugging, no rando
       }
     )
   }
@@ -125,8 +119,8 @@ export class RPSDataset {
     return this.nextBatch(batchSize, [this.testImages, this.testLabels], () => {
       this.shuffledTestIndex =
         (this.shuffledTestIndex + 1) % this.testIndices.length
-      return this.testIndices[this.shuffledTestIndex]
-      // return this.shuffledTestIndex // For debugging, no rando
+      // return this.testIndices[this.shuffledTestIndex]
+      return this.shuffledTestIndex // For debugging, no rando
     })
   }
 

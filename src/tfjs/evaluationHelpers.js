@@ -106,7 +106,8 @@ export const showExamples = async data => {
     canvas.width = IMAGE_WIDTH
     canvas.height = IMAGE_HEIGHT
     canvas.style = 'margin: 4px;'
-    await tf.browser.toPixels(fixedAxis, canvas)
+    const pixels = await tf.browser.toPixels(fixedAxis, canvas)
+    console.log('pixels', pixels)
     surface.drawArea.appendChild(canvas)
 
     imageTensor.dispose()
