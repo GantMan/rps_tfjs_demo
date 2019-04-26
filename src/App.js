@@ -38,7 +38,6 @@ class App extends Component {
     // assure video is still shown
     if (video[0]) {
       const predictions = await doSinglePrediction(this.model, video[0])
-      console.log(predictions)
       const camMessage = predictions
         .map(p => ` ${p.className}: %${(p.probability * 100).toFixed(2)}`)
         .toString()

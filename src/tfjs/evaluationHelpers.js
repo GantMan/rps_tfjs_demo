@@ -6,9 +6,9 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 
-export const doSinglePrediction = async (model, img) => {
+export const doSinglePrediction = async (model, img, options = {}) => {
   // First get logits
-  const logits = tf.tidy(() => {
+  const logits = tf.tidy(async () => {
     img = tf.browser.fromPixels(img)
     // Bring it down to gray
     const gray_mid = img.mean(2)
@@ -25,6 +25,11 @@ export const doSinglePrediction = async (model, img) => {
 
     // Singe-element batch
     const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
+
+    // if we want a visual
+    if (options.feedbackCanvas) {
+      await tf.browser.toPixels(batched, options.feedbackCanvas)
+    }
     // return logits
     return model.predict(batched)
   })
