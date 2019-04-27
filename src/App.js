@@ -24,7 +24,14 @@ class App extends Component {
 
   _renderWebcam = () => {
     if (this.state.webcamActive) {
-      return <Webcam ref={this._refWeb} className="captureCam" />
+      return (
+        <div className="results">
+          <div>64x64 Input</div>
+          <canvas id="compVision" />
+          <div>{this.state.camMessage}</div>
+          <Webcam ref={this._refWeb} className="captureCam" />
+        </div>
+      )
     }
   }
 
@@ -35,14 +42,18 @@ class App extends Component {
   detectWebcam = async () => {
     await this.sleep(100)
     const video = document.querySelectorAll('.captureCam')
+    const feedbackCanvas = document.getElementById('compVision')
     // assure video is still shown
     if (video[0]) {
-      const predictions = await doSinglePrediction(this.model, video[0])
-      console.log(predictions)
+      const options = { feedbackCanvas }
+      const predictions = await doSinglePrediction(
+        this.model,
+        video[0],
+        options
+      )
       const camMessage = predictions
         .map(p => ` ${p.className}: %${(p.probability * 100).toFixed(2)}`)
         .toString()
-      //setstate here
       this.setState({ camMessage })
       setTimeout(this.detectWebcam, DETECTION_PERIOD)
     }
@@ -276,7 +287,6 @@ class App extends Component {
           >
             {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
           </button>
-          {this.state.camMessage}
           {this._renderWebcam()}
         </div>
         <div className="GroupUp">

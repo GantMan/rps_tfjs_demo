@@ -6,31 +6,39 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 
-export const doSinglePrediction = async (model, img) => {
-  // First get logits
-  const logits = tf.tidy(() => {
+export const doSinglePrediction = async (model, img, options = {}) => {
+  // First get input tensor
+  const resized = tf.tidy(() => {
     img = tf.browser.fromPixels(img)
     // Bring it down to gray
     const gray_mid = img.mean(2)
     const gray = gray_mid.expandDims(2) // back to (width, height, 1)
-    let resized
-    if (img.shape[0] !== IMAGE_WIDTH || img.shape[1] !== IMAGE_WIDTH) {
-      const alignCorners = true
-      resized = tf.image.resizeBilinear(
-        gray,
-        [IMAGE_WIDTH, IMAGE_HEIGHT],
-        alignCorners
-      )
-    }
+    // assure (img.shape[0] === IMAGE_WIDTH && img.shape[1] === IMAGE_WIDTH
+    const alignCorners = true
+    return tf.image.resizeBilinear(
+      gray,
+      [IMAGE_WIDTH, IMAGE_HEIGHT],
+      alignCorners
+    )
+  })
 
+  const logits = tf.tidy(() => {
     // Singe-element batch
     const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
-    // return logits
+
+    // return the logits
     return model.predict(batched)
   })
 
   const values = await logits.data()
-  // cleanup logits
+
+  // if we want a visual
+  const { feedbackCanvas } = options
+  if (feedbackCanvas) {
+    await tf.browser.toPixels(resized.div(tf.scalar(255)), feedbackCanvas)
+  }
+  // cleanup tensors
+  resized.dispose()
   logits.dispose()
   // return class + prediction of all
   return classNames.map((className, idx) => ({
@@ -72,13 +80,10 @@ export const showConfusion = async (
   const [preds, labels] = doPrediction(model, data)
   const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds)
   const container = { name: title, tab: 'Evaluation' }
-  tfvis.render.confusionMatrix(
-    container,
-    { 
-        values: confusionMatrix,
-        tickLabels: classNames
-    }
-  )
+  tfvis.render.confusionMatrix(container, {
+    values: confusionMatrix,
+    tickLabels: classNames
+  })
 
   labels.dispose()
 }

@@ -142,6 +142,10 @@ body {
   padding-top: 15px;
 }
 
+.results {
+  text-align: center;
+}
+
 .me {
   max-height: 200px;
 }
