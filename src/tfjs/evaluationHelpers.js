@@ -6,14 +6,12 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 
-export const doSinglePrediction = async (model, img, options = {}) => {
-  // First get input tensor
-  const resized = tf.tidy(() => {
+export const imageToTensor = img => {
+  return tf.tidy(() => {
     img = tf.browser.fromPixels(img)
     // Bring it down to gray
     const gray_mid = img.mean(2)
     const gray = gray_mid.expandDims(2) // back to (width, height, 1)
-    // assure (img.shape[0] === IMAGE_WIDTH && img.shape[1] === IMAGE_WIDTH
     const alignCorners = true
     return tf.image.resizeBilinear(
       gray,
@@ -21,9 +19,14 @@ export const doSinglePrediction = async (model, img, options = {}) => {
       alignCorners
     )
   })
+}
+
+export const doSinglePrediction = async (model, img, options = {}) => {
+  // First get input tensor
+  const resized = imageToTensor(img)
 
   const logits = tf.tidy(() => {
-    // Singe-element batch
+    // Singe-element batch of single channel images
     const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
 
     // return the logits

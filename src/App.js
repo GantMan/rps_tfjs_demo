@@ -4,14 +4,16 @@ import gant from './corn.png'
 import './App.css'
 import { RPSDataset } from './tfjs/data.js'
 import { getAdvancedModel, getSimpleModel } from './tfjs/models.js'
-import { train } from './tfjs/train.js'
+import { train, trainLocals } from './tfjs/train.js'
 import {
+  imageToTensor,
   showAccuracy,
   showConfusion,
   showExamples,
   doSinglePrediction
 } from './tfjs/evaluationHelpers.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
+import * as tf from '@tensorflow/tfjs'
 
 const DETECTION_PERIOD = 2000
 
@@ -19,7 +21,82 @@ class App extends Component {
   state = {
     currentModel: null,
     webcamActive: false,
-    camMessage: ''
+    camMessage: '',
+    localTensorImages: null,
+    localTensorAnswers: []
+  }
+
+  _addSample = answer => {
+    const video = document.querySelectorAll('.captureCam')
+    if (video[0]) {
+      // get a tensor of the current webcam
+      const newSample = imageToTensor(video[0])
+      const smooshed = newSample.reshape([64 * 64, 1])
+      // concat to local tensors
+      this.setState(prevState => {
+        // concat answers
+        const newAnswers = prevState.localTensorAnswers.concat(answer)
+        // concat images
+        if (prevState.localTensorImages) {
+          return {
+            localTensorAnswers: newAnswers,
+            localTensorImages: smooshed.concat(prevState.localTensorImages)
+          }
+        } else {
+          return {
+            localTensorAnswers: newAnswers,
+            localTensorImages: smooshed
+          }
+        }
+      })
+    }
+  }
+
+  _renderLocalTraining = () => {
+    return (
+      <div>
+        <p>
+          By using the buttons below, we can add some real world examples to use
+          in training our model.
+        </p>
+        <div className="GroupUp">
+          <button
+            className="myButton"
+            onClick={() => this._addSample([1, 0, 0])}
+          >
+            + ROCK
+          </button>
+          <button
+            className="myButton"
+            onClick={() => this._addSample([0, 1, 0])}
+          >
+            + PAPER
+          </button>
+          <button
+            className="myButton"
+            onClick={() => this._addSample([0, 0, 1])}
+          >
+            + SCISSORS
+          </button>
+        </div>
+        <button
+          className="myButton"
+          onClick={async () => {
+            await trainLocals(this.model, [
+              this.state.localTensorImages,
+              this.state.localTensorAnswers
+            ])
+            this.state.localTensorImages.dispose()
+            this.setState({
+              localTensorAnswers: [],
+              localTensorImages: null
+            })
+          }}
+        >
+          TRAIN WITH NEW SAMPLES
+        </button>
+      </div>
+    )
   }
 
   _renderWebcam = () => {
@@ -30,6 +107,7 @@ class App extends Component {
           <canvas id="compVision" />
           <div>{this.state.camMessage}</div>
           <Webcam ref={this._refWeb} className="captureCam" />
+          {this._renderLocalTraining()}
         </div>
       )
     }
@@ -106,6 +184,7 @@ class App extends Component {
             <span className="cod">`</span> or <span className="cod">~</span> key
             to hide this menu.
           </p>
+          <p>Some of these buttons will have long delays, so be patient.</p>
           <button
             className="myButton"
             onClick={async () => {
