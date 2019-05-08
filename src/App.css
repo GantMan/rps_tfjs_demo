@@ -214,3 +214,47 @@ body {
   height: 75px;
   padding: 20px 25px 20px 0px;
 }
+
+.advancedContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#advancedLoadText {
+  text-align: center;
+  font-size: 1.5em;
+  margin: 0;
+  -webkit-animation: rainbow-text 3s infinite;
+  animation: rainbow-text 3s infinite;
+}
+
+.advancedCam {
+  position: relative;
+}
+
+.advancedBox {
+  position: absolute;
+}
+
+@keyframes rainbow-text {
+  0% {
+    color: #e63462;
+  }
+  20% {
+    color: #fde74c;
+  }
+  40% {
+    color: #9bc53d;
+  }
+  60% {
+    color: #5dd9c1;
+  }
+  80% {
+    color: #6457a6;
+  }
+  100% {
+    color: #fff;
+  }
+}
