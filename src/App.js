@@ -301,6 +301,17 @@ class App extends Component {
             {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
           </button>
           {this._renderWebcam()}
+          <p>
+            Did our model work for you? Maybe it did, and maybe it didn't! It's
+            a very simple model that we've created on very simple data. Don't
+            feel bad if it didn't work.
+          </p>
+          <p>
+            What does it look like to train a far more advanced model for hours
+            that results in a 20+MB model? Here's an opportunity for you to try
+            it yourself! This model isn't as diverse, but for demo purposes it's
+            inspiring!
+          </p>
           <button
             className="myButton"
             onClick={() => {
@@ -315,11 +326,15 @@ class App extends Component {
               : 'Show Advanced Demo'}
           </button>
           {this._renderAdvancedModel()}
-        </div>
-        <div className="GroupUp">
-          <p className="outro">
-            You just trained a Machine Learning model directly in your browser!
-            For a much more robust model example, please see{' '}
+          <p>
+            Machine Learning is exciting! And now you're part of it, as you
+            trained a model right in your browser. We've only scratched the
+            surface of what you can build. Automating with ML on computers is
+            only limited by our imagination!
+          </p>
+          <p>
+            If you'd like to see more applications of TensorflowJS be sure to
+            check out{' '}
             <a
               href="https://nsfwjs.com"
               target="_blank"
@@ -327,9 +342,34 @@ class App extends Component {
             >
               NSFWJS.com
             </a>
-            . Follow me and Infinite Red for cool new experiments, and let us
-            know what cool things you've come up with.{' '}
-            <em>We can help, we're available for AI consulting!</em>
+            , or the very useful{' '}
+            <a
+              href="https://nicornot.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              NicOrNot.com
+            </a>
+            . For more entertaining applications of Machine Learning, be sure to
+            subscribe to our Twitter account:
+          </p>
+
+          <a
+            href="https://twitter.com/FunMachineLearn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="fml.png" style={{ width: '50%', marginLeft: '25%' }} />
+            <p style={{ textAlign: 'center' }}>@FunMachineLearn</p>
+          </a>
+        </div>
+        <div className="GroupUp">
+          <p className="outro">
+            Follow me (Gant Laborde) and Infinite Red for cool new experiments,
+            and let us know what cool things you've come up with.{' '}
+            <em>
+              We can help, we're available for AI consulting and training.
+            </em>
           </p>
         </div>
         <div className="GroupUp">

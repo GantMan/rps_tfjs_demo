@@ -10,6 +10,10 @@ export default class AdvancedModel extends React.Component {
   videoRef = React.createRef()
   canvasRef = React.createRef()
 
+  state = {
+    loading: true
+  }
+
   componentDidMount() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       const webCamPromise = navigator.mediaDevices
@@ -34,6 +38,7 @@ export default class AdvancedModel extends React.Component {
       Promise.all([modelPromise, labelsPromise, webCamPromise])
         .then(values => {
           const [model, labels] = values
+          this.setState({ loading: false })
           this.detectFrame(this.videoRef.current, model, labels)
         })
         .catch(error => {
@@ -42,13 +47,28 @@ export default class AdvancedModel extends React.Component {
     }
   }
 
+  componentWillUnmount = () => {
+    // stop and collect garbage
+    let stream = window.stream
+    let tracks = stream.getTracks()
+
+    tracks.forEach(track => {
+      track.stop()
+    })
+
+    window.stream = null
+  }
+
   detectFrame = (video, model, labels) => {
     TFWrapper(model)
       .detect(video)
       .then(predictions => {
         this.renderPredictions(predictions, labels)
         requestAnimationFrame(() => {
-          this.detectFrame(video, model, labels)
+          // calm down when hidden!
+          if (this.canvasRef.current) {
+            this.detectFrame(video, model, labels)
+          }
         })
       })
   }
@@ -92,6 +112,9 @@ export default class AdvancedModel extends React.Component {
   render() {
     return (
       <div className="advancedContainer">
+        {this.state.loading && (
+          <p id="advancedLoadText">Please wait, loading advanced model</p>
+        )}
         <video
           className="advancedCam"
           autoPlay
