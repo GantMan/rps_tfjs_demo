@@ -11,6 +11,7 @@ import {
   showExamples,
   doSinglePrediction
 } from './tfjs/evaluationHelpers.js'
+import AdvancedModel from './AdvancedModel.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
 
 const DETECTION_PERIOD = 2000
@@ -19,7 +20,18 @@ class App extends Component {
   state = {
     currentModel: null,
     webcamActive: false,
-    camMessage: ''
+    camMessage: '',
+    advancedDemo: false
+  }
+
+  _renderAdvancedModel = () => {
+    if (this.state.advancedDemo) {
+      return (
+        <div>
+          <AdvancedModel key="advancedDemo" />
+        </div>
+      )
+    }
   }
 
   _renderWebcam = () => {
@@ -278,6 +290,7 @@ class App extends Component {
               if (!this.model) return
               this.setState(
                 prevState => ({
+                  advancedDemo: false,
                   webcamActive: !prevState.webcamActive,
                   camMessage: ''
                 }),
@@ -288,6 +301,20 @@ class App extends Component {
             {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
           </button>
           {this._renderWebcam()}
+          <button
+            className="myButton"
+            onClick={() => {
+              this.setState(prevState => ({
+                webcamActive: false,
+                advancedDemo: !prevState.advancedDemo
+              }))
+            }}
+          >
+            {this.state.advancedDemo
+              ? 'Turn Off Advanced Demo'
+              : 'Show Advanced Demo'}
+          </button>
+          {this._renderAdvancedModel()}
         </div>
         <div className="GroupUp">
           <p className="outro">

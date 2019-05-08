@@ -214,3 +214,17 @@ body {
   height: 75px;
   padding: 20px 25px 20px 0px;
 }
+
+.advancedContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.advancedCam {
+  position: relative;
+}
+
+.advancedBox {
+  position: absolute;
+}
