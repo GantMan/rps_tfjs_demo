@@ -89,28 +89,21 @@ export const showExamples = async data => {
 
   // Get the examples
   const examples = data.nextTestBatch(42)
-  const numExamples = examples.xs.shape[0]
 
-  // Create a canvas element to render each example
-  for (let i = 0; i < numExamples; i++) {
-    const imageTensor = tf.tidy(() => {
-      // Reshape the image to widt*height px
-      return examples.xs
-        .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([NUM_CHANNELS, IMAGE_WIDTH, IMAGE_HEIGHT])
-    })
+  tf.unstack(examples.xs).forEach(async tensor => {
 
+    const imageTensor = tensor.reshape([NUM_CHANNELS, IMAGE_WIDTH, IMAGE_HEIGHT])
     // Re-organize to be num_channels last
     const fixedAxis = tf.transpose(imageTensor, [1, 2, 0])
     const canvas = document.createElement('canvas')
     canvas.width = IMAGE_WIDTH
     canvas.height = IMAGE_HEIGHT
     canvas.style = 'margin: 4px;'
-    const pixels = await tf.browser.toPixels(fixedAxis, canvas)
-    console.log('pixels', pixels)
+    await tf.browser.toPixels(fixedAxis, canvas)
     surface.drawArea.appendChild(canvas)
 
+    tensor.dispose()
     imageTensor.dispose()
     fixedAxis.dispose()
-  }
+  })
 }
