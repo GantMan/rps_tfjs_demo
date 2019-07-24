@@ -91,8 +91,11 @@ export const showExamples = async data => {
   const examples = data.nextTestBatch(42)
 
   tf.unstack(examples.xs).forEach(async tensor => {
-
-    const imageTensor = tensor.reshape([NUM_CHANNELS, IMAGE_WIDTH, IMAGE_HEIGHT])
+    const imageTensor = tensor.reshape([
+      NUM_CHANNELS,
+      IMAGE_WIDTH,
+      IMAGE_HEIGHT
+    ])
     // Re-organize to be num_channels last
     const fixedAxis = tf.transpose(imageTensor, [1, 2, 0])
     const canvas = document.createElement('canvas')

@@ -47,8 +47,8 @@ export class RPSDataset {
         for (let i = 0; i < NUM_DATASET_ELEMENTS / chunkSize; i++) {
           const datasetBytesView = new Float32Array(
             datasetBytesBuffer, // buffer
-            i * chunkSize * IMAGE_SIZE * 4, // byteOffset * 4 because RGBA format
-            IMAGE_SIZE * chunkSize * NUM_CHANNELS  // length
+            i * chunkSize * IMAGE_SIZE * 4 * NUM_CHANNELS, // byteOffset * 4 because RGBA format
+            IMAGE_SIZE * chunkSize * NUM_CHANNELS // length
           )
           ctx.drawImage(
             img,
@@ -64,13 +64,12 @@ export class RPSDataset {
 
           // RGBA of image pixels (0-255)
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-
           let x = 0
           // Jumps by 4 storing RGBA
-          for (let j = 0; j < imageData.data.length; j+=4) {
-            // Stores R, then G, then B, then A 
+          for (let j = 0; j < imageData.data.length; j += 4) {
+            // Stores R, then G, then B, then A
             for (let i = 0; i < NUM_CHANNELS; i++) {
-              datasetBytesView[x++] = imageData.data[j+i] / 255
+              datasetBytesView[x++] = imageData.data[j + i] / 255
             }
           }
         }
@@ -101,7 +100,9 @@ export class RPSDataset {
       0,
       IMAGE_SIZE * NUM_TRAIN_ELEMENTS * NUM_CHANNELS
     )
-    this.testImages = this.datasetImages.slice(IMAGE_SIZE * NUM_TRAIN_ELEMENTS * NUM_CHANNELS)
+    this.testImages = this.datasetImages.slice(
+      IMAGE_SIZE * NUM_TRAIN_ELEMENTS * NUM_CHANNELS
+    )
     this.trainLabels = this.datasetLabels.slice(
       0,
       NUM_CLASSES * NUM_TRAIN_ELEMENTS
@@ -154,7 +155,6 @@ export class RPSDataset {
       )
       batchLabelsArray.set(label, i * NUM_CLASSES)
     }
-
     const xs = tf.tensor3d(batchImagesArray, [
       batchSize,
       IMAGE_SIZE,
