@@ -46,7 +46,7 @@ const doPrediction = (model, data, testDataSize = 420) => {
     testDataSize,
     IMAGE_WIDTH,
     IMAGE_HEIGHT,
-    1
+    NUM_CHANNELS
   ])
   const labels = testData.labels.argMax([-1])
   const preds = model.predict(testxs).argMax([-1])

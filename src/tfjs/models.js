@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs'
 
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
-const IMAGE_CHANNELS = 1
+const IMAGE_CHANNELS = 3
 
 export const getAdvancedModel = () => {
   const model = tf.sequential()
