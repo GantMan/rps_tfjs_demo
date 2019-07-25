@@ -7,31 +7,39 @@ const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
 const NUM_CHANNELS = 3
 
-export const doSinglePrediction = async (model, img) => {
-  // First get logits
-  const logits = tf.tidy(() => {
+export const doSinglePrediction = async (model, img, options = {}) => {
+  // First get input tensor
+  const resized = tf.tidy(() => {
     img = tf.browser.fromPixels(img)
     // Bring it down to gray
     const gray_mid = img.mean(2)
     const gray = gray_mid.expandDims(2) // back to (width, height, 1)
-    let resized
-    if (img.shape[0] !== IMAGE_WIDTH || img.shape[1] !== IMAGE_WIDTH) {
-      const alignCorners = true
-      resized = tf.image.resizeBilinear(
-        gray,
-        [IMAGE_WIDTH, IMAGE_HEIGHT],
-        alignCorners
-      )
-    }
+    // assure (img.shape[0] === IMAGE_WIDTH && img.shape[1] === IMAGE_WIDTH
+    const alignCorners = true
+    return tf.image.resizeBilinear(
+      gray,
+      [IMAGE_WIDTH, IMAGE_HEIGHT],
+      alignCorners
+    )
+  })
 
+  const logits = tf.tidy(() => {
     // Singe-element batch
     const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
-    // return logits
+
+    // return the logits
     return model.predict(batched)
   })
 
   const values = await logits.data()
-  // cleanup logits
+
+  // if we want a visual
+  const { feedbackCanvas } = options
+  if (feedbackCanvas) {
+    await tf.browser.toPixels(resized.div(tf.scalar(255)), feedbackCanvas)
+  }
+  // cleanup tensors
+  resized.dispose()
   logits.dispose()
   // return class + prediction of all
   return classNames.map((className, idx) => ({
@@ -107,4 +115,117 @@ export const showExamples = async data => {
     tensor.dispose()
     imageTensor.dispose()
   })
+}
+
+// provided by https://github.com/cloud-annotations/object-detection-react
+// trained via IBM cloud https://cloud-annotations.github.io/training/object-detection/cli/index.html
+export const TFWrapper = model => {
+  const calculateMaxScores = (scores, numBoxes, numClasses) => {
+    const maxes = []
+    const classes = []
+    for (let i = 0; i < numBoxes; i++) {
+      let max = Number.MIN_VALUE
+      let index = -1
+      for (let j = 0; j < numClasses; j++) {
+        if (scores[i * numClasses + j] > max) {
+          max = scores[i * numClasses + j]
+          index = j
+        }
+      }
+      maxes[i] = max
+      classes[i] = index
+    }
+    return [maxes, classes]
+  }
+
+  const buildDetectedObjects = (
+    width,
+    height,
+    boxes,
+    scores,
+    indexes,
+    classes
+  ) => {
+    const count = indexes.length
+    const objects = []
+    for (let i = 0; i < count; i++) {
+      const bbox = []
+      for (let j = 0; j < 4; j++) {
+        bbox[j] = boxes[indexes[i] * 4 + j]
+      }
+      const minY = bbox[0] * height
+      const minX = bbox[1] * width
+      const maxY = bbox[2] * height
+      const maxX = bbox[3] * width
+      bbox[0] = minX
+      bbox[1] = minY
+      bbox[2] = maxX - minX
+      bbox[3] = maxY - minY
+      objects.push({
+        bbox: bbox,
+        class: classes[indexes[i]],
+        score: scores[indexes[i]]
+      })
+    }
+    return objects
+  }
+
+  const detect = input => {
+    const batched = tf.tidy(() => {
+      const img = tf.browser.fromPixels(input)
+      // Reshape to a single-element batch so we can pass it to executeAsync.
+      return img.expandDims(0)
+    })
+
+    const height = batched.shape[1]
+    const width = batched.shape[2]
+
+    return model.executeAsync(batched).then(result => {
+      const scores = result[0].dataSync()
+      const boxes = result[1].dataSync()
+
+      // clean the webgl tensors
+      batched.dispose()
+      tf.dispose(result)
+
+      const [maxScores, classes] = calculateMaxScores(
+        scores,
+        result[0].shape[1],
+        result[0].shape[2]
+      )
+
+      const prevBackend = tf.getBackend()
+      // run post process in cpu
+      tf.setBackend('cpu')
+      const indexTensor = tf.tidy(() => {
+        const boxes2 = tf.tensor2d(boxes, [
+          result[1].shape[1],
+          result[1].shape[3]
+        ])
+        return tf.image.nonMaxSuppression(
+          boxes2,
+          maxScores,
+          20, // maxNumBoxes
+          0.5, // iou_threshold
+          0.5 // score_threshold
+        )
+      })
+      const indexes = indexTensor.dataSync()
+      indexTensor.dispose()
+      // restore previous backend
+      tf.setBackend(prevBackend)
+
+      return buildDetectedObjects(
+        width,
+        height,
+        boxes,
+        maxScores,
+        indexes,
+        classes
+      )
+    })
+  }
+  return {
+    detect: detect
+  }
 }
