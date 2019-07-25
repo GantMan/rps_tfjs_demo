@@ -92,21 +92,19 @@ export const showExamples = async data => {
 
   tf.unstack(examples.xs).forEach(async tensor => {
     const imageTensor = tensor.reshape([
-      NUM_CHANNELS,
       IMAGE_WIDTH,
-      IMAGE_HEIGHT
+      IMAGE_HEIGHT,
+      NUM_CHANNELS
     ])
     // Re-organize to be num_channels last
-    const fixedAxis = tf.transpose(imageTensor, [1, 2, 0])
     const canvas = document.createElement('canvas')
     canvas.width = IMAGE_WIDTH
     canvas.height = IMAGE_HEIGHT
     canvas.style = 'margin: 4px;'
-    await tf.browser.toPixels(fixedAxis, canvas)
+    await tf.browser.toPixels(imageTensor, canvas)
     surface.drawArea.appendChild(canvas)
 
     tensor.dispose()
     imageTensor.dispose()
-    fixedAxis.dispose()
   })
 }

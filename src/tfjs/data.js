@@ -47,7 +47,7 @@ export class RPSDataset {
         for (let i = 0; i < NUM_DATASET_ELEMENTS / chunkSize; i++) {
           const datasetBytesView = new Float32Array(
             datasetBytesBuffer, // buffer
-            i * chunkSize * IMAGE_SIZE * 4 * NUM_CHANNELS, // byteOffset * 4 because RGBA format
+            i * chunkSize * IMAGE_SIZE * BYTES_PER_UINT8 * NUM_CHANNELS, // byteOffset * 4 because RGBA format
             IMAGE_SIZE * chunkSize * NUM_CHANNELS // length
           )
           ctx.drawImage(
