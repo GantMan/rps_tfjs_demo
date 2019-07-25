@@ -5,6 +5,7 @@ const classNames = ['Rock', 'Paper', 'Scissors']
 
 const IMAGE_WIDTH = 64
 const IMAGE_HEIGHT = 64
+const NUM_CHANNELS = 3
 
 export const doSinglePrediction = async (model, img, options = {}) => {
   // First get input tensor
@@ -53,7 +54,7 @@ const doPrediction = (model, data, testDataSize = 420) => {
     testDataSize,
     IMAGE_WIDTH,
     IMAGE_HEIGHT,
-    1
+    NUM_CHANNELS
   ])
   const labels = testData.labels.argMax([-1])
   const preds = model.predict(testxs).argMax([-1])
@@ -96,17 +97,14 @@ export const showExamples = async data => {
 
   // Get the examples
   const examples = data.nextTestBatch(42)
-  const numExamples = examples.xs.shape[0]
 
-  // Create a canvas element to render each example
-  for (let i = 0; i < numExamples; i++) {
-    const imageTensor = tf.tidy(() => {
-      // Reshape the image to widt*height px
-      return examples.xs
-        .slice([i, 0], [1, examples.xs.shape[1]])
-        .reshape([IMAGE_WIDTH, IMAGE_HEIGHT, 1])
-    })
-
+  tf.unstack(examples.xs).forEach(async tensor => {
+    const imageTensor = tensor.reshape([
+      IMAGE_WIDTH,
+      IMAGE_HEIGHT,
+      NUM_CHANNELS
+    ])
+    // Re-organize to be num_channels last
     const canvas = document.createElement('canvas')
     canvas.width = IMAGE_WIDTH
     canvas.height = IMAGE_HEIGHT
@@ -114,8 +112,9 @@ export const showExamples = async data => {
     await tf.browser.toPixels(imageTensor, canvas)
     surface.drawArea.appendChild(canvas)
 
+    tensor.dispose()
     imageTensor.dispose()
-  }
+  })
 }
 
 // provided by https://github.com/cloud-annotations/object-detection-react

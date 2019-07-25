@@ -13,6 +13,7 @@ import {
 } from './tfjs/evaluationHelpers.js'
 import AdvancedModel from './AdvancedModel.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
+import * as tf from '@tensorflow/tfjs'
 
 const DETECTION_PERIOD = 2000
 
@@ -32,6 +33,13 @@ class App extends Component {
         </div>
       )
     }
+  }
+
+  componentDidMount() {
+    /*
+    Some code for debugging, sorrrrryyyyyy where is the best place for this?
+    */
+    window.tf = tf
   }
 
   _renderWebcam = () => {
@@ -81,7 +89,12 @@ class App extends Component {
         <header className="App-header">
           <h2>Rock Paper Scissors</h2>
           <h3>Machine Learning in the browser with TFJS</h3>
-          <img src="./rps_circle.png" className="App-logo" alt="logo" />
+          <img
+            src="./rps_circle.png"
+            className="App-logo"
+            alt="logo"
+            id="logo"
+          />
           <a
             className="App-link"
             href="https://infinite.red"
@@ -273,7 +286,7 @@ class App extends Component {
             values that make the model accurate.
           </p>
           <h3>Now let's see if we can test our model with the real world!</h3>
-          <img src="./rps_webcam_big.jpg" className="demo" />
+          <img src="./rps_webcam_big.jpg" className="demo" alt="webcam demo" />
           <p>
             Keep in mind, the training data for this model had no background,
             and the model itself isn't practiced in dealing with noise and
@@ -442,6 +455,7 @@ class App extends Component {
           <img
             src="./TF_FullColor_Horizontal.png"
             id="closer"
+            alt="Tensorflow logo"
             style={{ paddingLeft: '-40px' }}
           />
         </div>
