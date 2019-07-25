@@ -1,5 +1,13 @@
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
+import {
+  IMAGE_WIDTH,
+  IMAGE_HEIGHT,
+  NUM_CHANNELS,
+  BATCH_SIZE,
+  NUM_TRAIN_ELEMENTS,
+  NUM_TEST_ELEMENTS
+} from './constants'
 
 export const train = (model, data, numEpochs = 10) => {
   const metrics = ['loss', 'acc', 'val_acc']
@@ -10,25 +18,28 @@ export const train = (model, data, numEpochs = 10) => {
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics)
   tfvis.visor().setActiveTab('Visor')
 
-  const BATCH_SIZE = 512
-  const TRAIN_DATA_SIZE = 2100
-  const TEST_DATA_SIZE = 420
-  const NUM_CHANNELS = 3
-  const IMAGE_WIDTH = 64
-  const IMAGE_HEIGHT = 64
-
   const [trainXs, trainYs] = tf.tidy(() => {
-    const d = data.nextTrainBatch(TRAIN_DATA_SIZE)
+    const d = data.nextTrainBatch(NUM_TRAIN_ELEMENTS)
     return [
-      d.xs.reshape([TRAIN_DATA_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH, NUM_CHANNELS]),
+      d.xs.reshape([
+        NUM_TRAIN_ELEMENTS,
+        IMAGE_HEIGHT,
+        IMAGE_WIDTH,
+        NUM_CHANNELS
+      ]),
       d.labels
     ]
   })
 
   const [testXs, testYs] = tf.tidy(() => {
-    const d = data.nextTestBatch(TEST_DATA_SIZE)
+    const d = data.nextTestBatch(NUM_TEST_ELEMENTS)
     return [
-      d.xs.reshape([TEST_DATA_SIZE, IMAGE_HEIGHT, IMAGE_WIDTH, NUM_CHANNELS]),
+      d.xs.reshape([
+        NUM_TEST_ELEMENTS,
+        IMAGE_HEIGHT,
+        IMAGE_WIDTH,
+        NUM_CHANNELS
+      ]),
       d.labels
     ]
   })

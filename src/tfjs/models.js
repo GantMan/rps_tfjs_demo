@@ -1,15 +1,12 @@
 import * as tf from '@tensorflow/tfjs'
-
-const IMAGE_WIDTH = 64
-const IMAGE_HEIGHT = 64
-const IMAGE_CHANNELS = 3
+import { IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS } from './constants'
 
 export const getAdvancedModel = () => {
   const model = tf.sequential()
 
   model.add(
     tf.layers.conv2d({
-      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS],
+      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS],
       kernelSize: 3,
       padding: 'same',
       filters: 32,
@@ -83,7 +80,7 @@ export const getSimpleModel = () => {
   // the convolution operation that takes place in this layer.
   model.add(
     tf.layers.conv2d({
-      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS],
+      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS],
       kernelSize: 5,
       filters: 8,
       strides: 1,

@@ -1,23 +1,22 @@
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
+import { IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS } from './constants'
 
 const classNames = ['Rock', 'Paper', 'Scissors']
-
-const IMAGE_WIDTH = 64
-const IMAGE_HEIGHT = 64
-const NUM_CHANNELS = 3
 
 export const doSinglePrediction = async (model, img, options = {}) => {
   // First get input tensor
   const resized = tf.tidy(() => {
     img = tf.browser.fromPixels(img)
-    // Bring it down to gray
-    const gray_mid = img.mean(2)
-    const gray = gray_mid.expandDims(2) // back to (width, height, 1)
+    if (NUM_CHANNELS === 1) {
+      // Bring it down to gray
+      const gray_mid = img.mean(2)
+      img = gray_mid.expandDims(2) // back to (width, height, 1)
+    }
     // assure (img.shape[0] === IMAGE_WIDTH && img.shape[1] === IMAGE_WIDTH
     const alignCorners = true
     return tf.image.resizeBilinear(
-      gray,
+      img,
       [IMAGE_WIDTH, IMAGE_HEIGHT],
       alignCorners
     )
@@ -25,7 +24,12 @@ export const doSinglePrediction = async (model, img, options = {}) => {
 
   const logits = tf.tidy(() => {
     // Singe-element batch
-    const batched = resized.reshape([1, IMAGE_WIDTH, IMAGE_HEIGHT, 1])
+    const batched = resized.reshape([
+      1,
+      IMAGE_WIDTH,
+      IMAGE_HEIGHT,
+      NUM_CHANNELS
+    ])
 
     // return the logits
     return model.predict(batched)
