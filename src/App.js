@@ -30,6 +30,7 @@ class App extends Component {
       return (
         <div>
           <AdvancedModel key="advancedDemo" />
+          <p>Turn off ad-block where applicable</p>
         </div>
       )
     }
@@ -364,7 +365,15 @@ class App extends Component {
               NicOrNot.com
             </a>
             . For more entertaining applications of Machine Learning, be sure to
-            subscribe to our Twitter account:
+            subscribe to our{' '}
+            <a
+              href="https://infinite.red/machinelearning"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Newsletter
+            </a>{' '}
+            or follow my Fun Machine Learning Twitter account:
           </p>
 
           <a
@@ -436,6 +445,16 @@ class App extends Component {
                 rel="noopener noreferrer"
               >
                 RPS TFJS Demo
+              </a>
+            </li>
+            <li>
+              Newsletter:{' '}
+              <a
+                href="https://infinite.red/machinelearning"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ML Newsletter
               </a>
             </li>
             <li>
