@@ -28,16 +28,6 @@ class App extends Component {
     Some code for debugging, sorrrrryyyyyy where is the best place for this?
     */
     window.tf = tf
-    // // const top = document.getElementById('logo')
-    // const myCanvas = document.getElementById('myCanvas')
-    // const img = new Image()
-    // img.crossOrigin = 'anonymous'
-    // img.src = 'https://i.imgur.com/Kwxetau.jpg'
-    // img.onload = async () => {
-    //   const imageTensor = tf.browser.fromPixels(img)
-    //   // console.log(imageTensor)
-    //   await tf.browser.toPixels(imageTensor, myCanvas)
-    // }
   }
 
   _renderWebcam = () => {
@@ -82,7 +72,6 @@ class App extends Component {
             alt="logo"
             id="logo"
           />
-          <canvas id="myCanvas" />
           <a
             className="App-link"
             href="https://infinite.red"
