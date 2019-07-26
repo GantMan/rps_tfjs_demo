@@ -22,7 +22,8 @@ class App extends Component {
     currentModel: null,
     webcamActive: false,
     camMessage: '',
-    advancedDemo: false
+    advancedDemo: false,
+    loadDataMessage: 'Load and Show Examples'
   }
 
   _renderAdvancedModel = () => {
@@ -135,13 +136,15 @@ class App extends Component {
           <button
             className="myButton"
             onClick={async () => {
+              this.setState({ loadDataMessage: 'Loading 10MB Data' })
               const data = new RPSDataset()
               this.data = data
               await data.load()
               await showExamples(data)
+              this.setState({ loadDataMessage: 'Data Loaded!' })
             }}
           >
-            Load and Show Examples
+            {this.state.loadDataMessage}
           </button>
           <p>
             Each of the examples have been loaded now. Due to this being a
