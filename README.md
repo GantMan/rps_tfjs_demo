@@ -2,6 +2,7 @@
 ![rps header logo](./public/rps_logo.jpg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/ecb46145-5398-4a57-8cb5-888ba8ae2545/deploy-status)](https://app.netlify.com/sites/rps-tfjs/deploys)
 ## DEMO: https://rps-tfjs.netlify.com/
+## BLOG: https://heartbeat.fritz.ai/using-tensorflow-js-to-train-a-rock-paper-scissors-model-b5f393b548eb
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
