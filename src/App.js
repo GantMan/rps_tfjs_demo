@@ -128,7 +128,7 @@ class App extends Component {
           </p>
           <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
           <p>
-            We'll show progress in the TensorflowJS Vis panel. You'll see it
+            We'll show progress in the TensorFlow.js Vis panel. You'll see it
             when you click the load and show button below. Press{' '}
             <span className="cod">`</span> or <span className="cod">~</span> key
             to hide this menu.
@@ -350,7 +350,7 @@ class App extends Component {
             only limited by our imagination!
           </p>
           <p>
-            If you'd like to see more applications of TensorflowJS be sure to
+            If you'd like to see more applications of TensorFlow.js be sure to
             check out{' '}
             <a
               href="https://nsfwjs.com"
