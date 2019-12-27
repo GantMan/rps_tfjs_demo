@@ -17,8 +17,7 @@ import AdvancedModel from './AdvancedModel.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
 import * as tf from '@tensorflow/tfjs'
 import { setWasmPath } from '@tensorflow/tfjs-backend-wasm'
-import wasmPath from '../node_modules/@tensorflow/tfjs-backend-wasm/dist/tfjs-backend-wasm.wasm'
-setWasmPath(wasmPath)
+setWasmPath('/tfjs-backend-wasm.wasm')
 
 const DETECTION_PERIOD = 2000
 
