@@ -5,6 +5,8 @@ import './App.css'
 import { RPSDataset } from './tfjs/data.js'
 import { getAdvancedModel, getSimpleModel } from './tfjs/models.js'
 import { train } from './tfjs/train.js'
+import Dropdown from 'react-dropdown'
+import 'react-dropdown/style.css'
 import {
   showAccuracy,
   showConfusion,
@@ -14,6 +16,9 @@ import {
 import AdvancedModel from './AdvancedModel.js'
 import * as tfvis from '@tensorflow/tfjs-vis'
 import * as tf from '@tensorflow/tfjs'
+import { setWasmPath } from '@tensorflow/tfjs-backend-wasm'
+import wasmPath from '../node_modules/@tensorflow/tfjs-backend-wasm/dist/tfjs-backend-wasm.wasm'
+setWasmPath(wasmPath)
 
 const DETECTION_PERIOD = 2000
 
@@ -23,7 +28,8 @@ class App extends Component {
     webcamActive: false,
     camMessage: '',
     advancedDemo: false,
-    loadDataMessage: 'Load and Show Examples'
+    loadDataMessage: 'Load and Show Examples',
+    tfjsBackend: null
   }
 
   _renderAdvancedModel = () => {
@@ -42,6 +48,12 @@ class App extends Component {
     Some code for debugging, sorrrrryyyyyy where is the best place for this?
     */
     window.tf = tf
+    // switch to speedy when shipped
+    if (process.env.NODE_ENV === 'production') tf.enableProdMode()
+    // get default assigned backend
+    tf.ready().then(() => {
+      this.setState({ tfjsBackend: tf.getBackend() })
+    })
   }
 
   _renderWebcam = () => {
@@ -57,6 +69,7 @@ class App extends Component {
     }
   }
 
+  // I have brought shame upon myself by adding this
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
@@ -127,6 +140,29 @@ class App extends Component {
             </a>
           </p>
           <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
+          <p>
+            Before we start, you can pick a backend processor for the ML
+            functionality. It's perfectly acceptable not to know{' '}
+            <a
+              href="https://github.com/tensorflow/tfjs/tree/8bddb6fd243f9d99cffb2792e6279e3e84e127e8/tfjs-backend-wasm#when-should-i-use-the-wasm-backend"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              which one does what
+            </a>
+            . That's why I've included it here, so you can experiment!
+            <div style={{ maxWidth: 400, margin: 'auto' }}>
+              <Dropdown
+                options={['cpu', 'webgl', 'wasm']}
+                onChange={item => {
+                  this.setState({ tfjsBackend: item.value })
+                  tf.setBackend(item.value)
+                }}
+                value={this.state.tfjsBackend}
+              />
+            </div>
+          </p>
+
           <p>
             We'll show progress in the TensorFlow.js Vis panel. You'll see it
             when you click the load and show button below. Press{' '}
@@ -472,7 +508,7 @@ class App extends Component {
           </ul>
         </div>
         <div className="GroupUp">
-          <img src="./ml.png" id="closer" />
+          <img src="./ml.png" id="closer" alt="ML" />
           <h4>powered by</h4>
           <img
             src="./TF_FullColor_Horizontal.png"
