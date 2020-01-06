@@ -18,8 +18,8 @@ import * as tfvis from '@tensorflow/tfjs-vis'
 import * as tf from '@tensorflow/tfjs'
 import { setWasmPath } from '@tensorflow/tfjs-backend-wasm'
 setWasmPath('/tfjs-backend-wasm.wasm')
-
 const DETECTION_PERIOD = 2000
+const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length
 
 class App extends Component {
   state = {
@@ -28,14 +28,31 @@ class App extends Component {
     camMessage: '',
     advancedDemo: false,
     loadDataMessage: 'Load and Show Examples',
-    tfjsBackend: null
+    tfjsBackend: null,
+    inferences: []
   }
 
   _renderAdvancedModel = () => {
+    let inferenceAvg = 0
+    let inferenceLast = 0
+    if (this.state.inferences.length > 0) {
+      inferenceLast = this.state.inferences.slice(-1)[0]
+      inferenceAvg = average(this.state.inferences)
+    }
     if (this.state.advancedDemo) {
       return (
         <div>
-          <AdvancedModel key="advancedDemo" />
+          <AdvancedModel
+            key="advancedDemo"
+            updateInferences={n => {
+              this.setState(prevState => {
+                prevState.inferences.push(n)
+                return { inferences: prevState.inferences }
+              })
+            }}
+          />
+          <p>Last Inference: {inferenceLast}ms</p>
+          <p>Inference Average: {inferenceAvg}ms</p>
           <p>Turn off ad-block where applicable</p>
         </div>
       )
@@ -369,7 +386,8 @@ class App extends Component {
             onClick={() => {
               this.setState(prevState => ({
                 webcamActive: false,
-                advancedDemo: !prevState.advancedDemo
+                advancedDemo: !prevState.advancedDemo,
+                inferences: []
               }))
             }}
           >

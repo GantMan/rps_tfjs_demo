@@ -60,9 +60,14 @@ export default class AdvancedModel extends React.Component {
   }
 
   detectFrame = (video, model, labels) => {
+    // Check inference times
+    const inferenceStart = performance.now()
     TFWrapper(model)
       .detect(video)
       .then(predictions => {
+        const inferenceEnd = performance.now()
+        if (this.props.updateInferences)
+          this.props.updateInferences(inferenceEnd - inferenceStart)
         this.renderPredictions(predictions, labels)
         requestAnimationFrame(() => {
           // calm down when hidden!
