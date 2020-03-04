@@ -16,6 +16,15 @@ import AdvancedModel from "./AdvancedModel.js";
 import * as tfvis from "@tensorflow/tfjs-vis";
 import * as tf from "@tensorflow/tfjs";
 
+// Slide down code
+import { SlideDown } from "react-slidedown";
+import "react-slidedown/lib/slidedown.css";
+
+// Code Display Stuff
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-monokai";
+
 const DETECTION_PERIOD = 2000;
 
 class App extends Component {
@@ -24,7 +33,11 @@ class App extends Component {
     webcamActive: false,
     camMessage: "",
     advancedDemo: false,
-    loadDataMessage: "Load and Show Examples"
+    loadDataMessage: "Load and Show Examples",
+    code1: true,
+    code2: true,
+    code3: true,
+    code4: true
   };
 
   _renderAdvancedModel = () => {
@@ -148,10 +161,45 @@ class App extends Component {
             >
               {this.state.loadDataMessage}
             </button>
-            <button className="btn-3d green">
+            <button
+              className="btn-3d green"
+              onClick={() => this.setState({ code1: !this.state.code1 })}
+            >
               <strong>&lt;/&gt;</strong>
             </button>
           </div>
+          <SlideDown closed={this.state.code1}>
+            <AceEditor
+              placeholder="Don't Edit"
+              mode="javascript"
+              theme="monokai"
+              maxLInes={8}
+              height="16em"
+              name="load"
+              fontSize={18}
+              showPrintMargin={false}
+              showGutter={true}
+              readOnly={true}
+              highlightActiveLine={false}
+              value={`
+// Use custom data object
+const data = new RPSDataset();
+// Store on object
+this.data = data;
+// Parse tensors into memory
+await data.load();
+// Use VIS to make sure it worked!
+await showExamples(data);`}
+              setOptions={{
+                enableBasicAutocompletion: false,
+                enableLiveAutocompletion: false,
+                enableSnippets: false,
+                showLineNumbers: false,
+                tabSize: 2
+              }}
+            />
+          </SlideDown>
+
           <p>
             Each of the examples have been loaded now. Due to this being a
             browser, the data is loaded with one{" "}
@@ -197,10 +245,97 @@ class App extends Component {
             >
               Create Simple Model
             </button>
-            <button className="btn-3d green">
+            <button
+              className="btn-3d green"
+              onClick={() => this.setState({ code2: !this.state.code2 })}
+            >
               <strong>&lt;/&gt;</strong>
             </button>
           </div>
+          <SlideDown closed={this.state.code2} style={{ width: "100%" }}>
+            <AceEditor
+              placeholder="Don't Edit"
+              mode="javascript"
+              theme="monokai"
+              width="100%"
+              name="load"
+              fontSize={18}
+              showPrintMargin={false}
+              showGutter={true}
+              readOnly={true}
+              highlightActiveLine={false}
+              value={`
+export const getSimpleModel = () => {
+  const model = tf.sequential()
+
+  // In the first layer of out convolutional neural network we have
+  // to specify the input shape. Then we specify some parameters for
+  // the convolution operation that takes place in this layer.
+  model.add(
+    tf.layers.conv2d({
+      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS],
+      kernelSize: 5,
+      filters: 8,
+      strides: 1,
+      activation: 'relu',
+      kernelInitializer: 'varianceScaling'
+    })
+  )
+
+  // The MaxPooling layer acts as a sort of downsampling using max values
+  // in a region instead of averaging.
+  model.add(tf.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }))
+
+  // Repeat another conv2d + maxPooling stack.
+  // Note that we have more filters in the convolution.
+  model.add(
+    tf.layers.conv2d({
+      kernelSize: 5,
+      filters: 16,
+      strides: 1,
+      activation: 'relu',
+      kernelInitializer: 'varianceScaling'
+    })
+  )
+  model.add(tf.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }))
+
+  // Now we flatten the output from the 2D filters into a 1D vector to prepare
+  // it for input into our last layer. This is common practice when feeding
+  // higher dimensional data to a final classification output layer.
+  model.add(tf.layers.flatten())
+
+  // Our last layer is a dense layer which has 3 output units, one for each
+  // output class (i.e. 0, 1, 2).
+  const NUM_OUTPUT_CLASSES = 3
+  model.add(
+    tf.layers.dense({
+      units: NUM_OUTPUT_CLASSES,
+      kernelInitializer: 'varianceScaling',
+      activation: 'softmax'
+    })
+  )
+
+  // Choose an optimizer, loss function and accuracy metric,
+  // then compile and return the model
+  const optimizer = tf.train.adam()
+  model.compile({
+    optimizer: optimizer,
+    loss: 'categoricalCrossentropy',
+    metrics: ['accuracy']
+  })
+
+  return model
+}
+`}
+              setOptions={{
+                enableBasicAutocompletion: false,
+                enableLiveAutocompletion: false,
+                enableSnippets: false,
+                showLineNumbers: false,
+                tabSize: 2
+              }}
+            />
+          </SlideDown>
           <p>OR</p>
           <div className="GroupUp">
             <button
@@ -221,10 +356,105 @@ class App extends Component {
             >
               Create Advanced Model
             </button>
-            <button className="btn-3d green">
+            <button
+              className="btn-3d green"
+              onClick={() => this.setState({ code3: !this.state.code3 })}
+            >
               <strong>&lt;/&gt;</strong>
             </button>
           </div>
+          <SlideDown closed={this.state.code3} style={{ width: "100%" }}>
+            <AceEditor
+              placeholder="Don't Edit"
+              mode="javascript"
+              theme="monokai"
+              name="load"
+              width="100%"
+              fontSize={18}
+              showPrintMargin={false}
+              showGutter={true}
+              readOnly={true}
+              highlightActiveLine={false}
+              value={`
+export const getAdvancedModel = () => {
+  const model = tf.sequential()
+
+  model.add(
+    tf.layers.conv2d({
+      inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, NUM_CHANNELS],
+      kernelSize: 3,
+      padding: 'same',
+      filters: 32,
+      strides: 1,
+      activation: 'relu',
+      kernelInitializer: 'varianceScaling'
+    })
+  )
+
+  // Downsample, batchnorm, and dropout!
+  model.add(tf.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }))
+  model.add(tf.layers.batchNormalization())
+  model.add(tf.layers.dropout({ rate: 0.25 }))
+
+  model.add(
+    tf.layers.conv2d({
+      kernelSize: 3,
+      filters: 64,
+      padding: 'same',
+      strides: 1,
+      activation: 'relu',
+      kernelInitializer: 'varianceScaling'
+    })
+  )
+  model.add(tf.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }))
+  model.add(tf.layers.batchNormalization())
+  model.add(tf.layers.dropout({ rate: 0.25 }))
+
+  // Now we flatten the output from the 2D filters into a 1D vector to prepare
+  // it for input into our last layer.
+  model.add(tf.layers.flatten())
+
+  // complex dense intermediate
+  model.add(
+    tf.layers.dense({
+      units: 512,
+      kernelRegularizer: 'l1l2',
+      activation: 'relu'
+    })
+  )
+
+  // Our last layer is a dense layer which has 3 output units, one for each
+  // output class (i.e. 0, 1, 2).
+  const NUM_OUTPUT_CLASSES = 3
+  model.add(
+    tf.layers.dense({
+      units: NUM_OUTPUT_CLASSES,
+      kernelInitializer: 'varianceScaling',
+      activation: 'softmax'
+    })
+  )
+
+  // Choose an optimizer, loss function and accuracy metric,
+  // then compile and return the model
+  const optimizer = tf.train.adam()
+  model.compile({
+    optimizer: optimizer,
+    loss: 'categoricalCrossentropy',
+    metrics: ['accuracy']
+  })
+
+  return model
+}
+`}
+              setOptions={{
+                enableBasicAutocompletion: false,
+                enableLiveAutocompletion: false,
+                enableSnippets: false,
+                showLineNumbers: false,
+                tabSize: 2
+              }}
+            />
+          </SlideDown>
           <p>
             Creating a model, is the structure and blueprint. It starts off able
             to, but terrible at predicting.
@@ -241,9 +471,6 @@ class App extends Component {
               }}
             >
               Check Untrained Model Results
-            </button>
-            <button className="btn-3d green">
-              <strong>&lt;/&gt;</strong>
             </button>
           </div>
           <p>
@@ -264,10 +491,79 @@ class App extends Component {
             >
               Train Your {this.state.currentModel} Model
             </button>
-            <button className="btn-3d green">
+            <button
+              className="btn-3d green"
+              onClick={() => this.setState({ code4: !this.state.code4 })}
+            >
               <strong>&lt;/&gt;</strong>
             </button>
           </div>
+          <SlideDown closed={this.state.code4} style={{ width: "100%" }}>
+            <AceEditor
+              placeholder="Don't Edit"
+              mode="javascript"
+              theme="monokai"
+              width="100%"
+              name="load"
+              fontSize={18}
+              showPrintMargin={false}
+              showGutter={true}
+              readOnly={true}
+              highlightActiveLine={false}
+              value={`
+export const train = (model, data, numEpochs = 10) => {
+  const metrics = ['loss', 'acc', 'val_acc']
+  const container = {
+    name: 'Model Training',
+    styles: { height: '1000px' }
+  }
+  const fitCallbacks = tfvis.show.fitCallbacks(container, metrics)
+  tfvis.visor().setActiveTab('Visor')
+
+  const [trainXs, trainYs] = tf.tidy(() => {
+    const d = data.nextTrainBatch(NUM_TRAIN_ELEMENTS)
+    return [
+      d.xs.reshape([
+        NUM_TRAIN_ELEMENTS,
+        IMAGE_HEIGHT,
+        IMAGE_WIDTH,
+        NUM_CHANNELS
+      ]),
+      d.labels
+    ]
+  })
+
+  const [testXs, testYs] = tf.tidy(() => {
+    const d = data.nextTestBatch(NUM_TEST_ELEMENTS)
+    return [
+      d.xs.reshape([
+        NUM_TEST_ELEMENTS,
+        IMAGE_HEIGHT,
+        IMAGE_WIDTH,
+        NUM_CHANNELS
+      ]),
+      d.labels
+    ]
+  })
+
+  return model.fit(trainXs, trainYs, {
+    batchSize: BATCH_SIZE,
+    validationData: [testXs, testYs],
+    epochs: numEpochs,
+    shuffle: true,
+    callbacks: fitCallbacks
+  })
+}
+`}
+              setOptions={{
+                enableBasicAutocompletion: false,
+                enableLiveAutocompletion: false,
+                enableSnippets: false,
+                showLineNumbers: false,
+                tabSize: 2
+              }}
+            />
+          </SlideDown>
           <p>
             Now that our model has seen some stuff{" "}
             <span role="img" aria-label="woah">
