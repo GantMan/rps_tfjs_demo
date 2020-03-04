@@ -1,30 +1,30 @@
-import React, { Component } from 'react'
-import Webcam from 'react-webcam'
-import gant from './corn.png'
-import './App.css'
-import { RPSDataset } from './tfjs/data.js'
-import { getAdvancedModel, getSimpleModel } from './tfjs/models.js'
-import { train } from './tfjs/train.js'
+import React, { Component } from "react";
+import Webcam from "react-webcam";
+import gant from "./corn.png";
+import "./App.css";
+import { RPSDataset } from "./tfjs/data.js";
+import { getAdvancedModel, getSimpleModel } from "./tfjs/models.js";
+import { train } from "./tfjs/train.js";
 import {
   showAccuracy,
   showConfusion,
   showExamples,
   doSinglePrediction
-} from './tfjs/evaluationHelpers.js'
-import AdvancedModel from './AdvancedModel.js'
-import * as tfvis from '@tensorflow/tfjs-vis'
-import * as tf from '@tensorflow/tfjs'
+} from "./tfjs/evaluationHelpers.js";
+import AdvancedModel from "./AdvancedModel.js";
+import * as tfvis from "@tensorflow/tfjs-vis";
+import * as tf from "@tensorflow/tfjs";
 
-const DETECTION_PERIOD = 2000
+const DETECTION_PERIOD = 2000;
 
 class App extends Component {
   state = {
     currentModel: null,
     webcamActive: false,
-    camMessage: '',
+    camMessage: "",
     advancedDemo: false,
-    loadDataMessage: 'Load and Show Examples'
-  }
+    loadDataMessage: "Load and Show Examples"
+  };
 
   _renderAdvancedModel = () => {
     if (this.state.advancedDemo) {
@@ -33,15 +33,15 @@ class App extends Component {
           <AdvancedModel key="advancedDemo" />
           <p>Turn off ad-block where applicable</p>
         </div>
-      )
+      );
     }
-  }
+  };
 
   componentDidMount() {
     /*
     Some code for debugging, sorrrrryyyyyy where is the best place for this?
     */
-    window.tf = tf
+    window.tf = tf;
   }
 
   _renderWebcam = () => {
@@ -53,44 +53,44 @@ class App extends Component {
           <div>{this.state.camMessage}</div>
           <Webcam ref={this._refWeb} className="captureCam" />
         </div>
-      )
+      );
     }
-  }
+  };
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   detectWebcam = async () => {
-    await this.sleep(100)
-    const video = document.querySelectorAll('.captureCam')
-    const feedbackCanvas = document.getElementById('compVision')
+    await this.sleep(100);
+    const video = document.querySelectorAll(".captureCam");
+    const feedbackCanvas = document.getElementById("compVision");
     // assure video is still shown
     if (video[0]) {
-      const options = { feedbackCanvas }
+      const options = { feedbackCanvas };
       const predictions = await doSinglePrediction(
         this.model,
         video[0],
         options
-      )
+      );
       const camMessage = predictions
         .map(p => ` ${p.className}: %${(p.probability * 100).toFixed(2)}`)
-        .toString()
-      this.setState({ camMessage })
-      setTimeout(this.detectWebcam, DETECTION_PERIOD)
+        .toString();
+      this.setState({ camMessage });
+      setTimeout(this.detectWebcam, DETECTION_PERIOD);
     }
-  }
+  };
 
   _refWeb = webcam => {
-    this.webcam = webcam
-  }
+    this.webcam = webcam;
+  };
 
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <h2>Rock Paper Scissors</h2>
-          <h3>Machine Learning in the browser with TFJS</h3>
+          <h3>Machine Learning in the browser with TensorFlow.js</h3>
           <img
             src="./rps_circle.png"
             className="App-logo"
@@ -117,7 +117,7 @@ class App extends Component {
         <div className="Main">
           <p>
             We'll be working with a fun dataset for the classic game, "Rock
-            Paper Scissors", provided here:{' '}
+            Paper Scissors", provided here:{" "}
             <a
               href="http://www.laurencemoroney.com/rock-paper-scissors-dataset/"
               target="_blank"
@@ -129,31 +129,31 @@ class App extends Component {
           <img src="./rps.jpg" alt="Rock Paper Scissors dataset" />
           <p>
             We'll show progress in the TensorFlow.js Vis panel. You'll see it
-            when you click the load and show button below. Press{' '}
+            when you click the load and show button below. Press{" "}
             <span className="cod">`</span> or <span className="cod">~</span> key
             to hide this menu.
           </p>
           <button
             className="myButton"
             onClick={async () => {
-              this.setState({ loadDataMessage: 'Loading 10MB Data' })
-              const data = new RPSDataset()
-              this.data = data
-              await data.load()
-              await showExamples(data)
-              this.setState({ loadDataMessage: 'Data Loaded!' })
+              this.setState({ loadDataMessage: "Loading 10MB Data" });
+              const data = new RPSDataset();
+              this.data = data;
+              await data.load();
+              await showExamples(data);
+              this.setState({ loadDataMessage: "Data Loaded!" });
             }}
           >
             {this.state.loadDataMessage}
           </button>
           <p>
             Each of the examples have been loaded now. Due to this being a
-            browser, the data is loaded with one{' '}
+            browser, the data is loaded with one{" "}
             <a href="./data.png" target="_blank" rel="noopener noreferrer">
               sprite-sheet
-            </a>{' '}
+            </a>{" "}
             to get around sandboxing. My code to create sprite-sheets is
-            available with{' '}
+            available with{" "}
             <a
               href="https://github.com/GantMan/rps_tfjs_demo"
               target="_blank"
@@ -165,46 +165,46 @@ class App extends Component {
           </p>
           <p>
             You now create the structure for the data, that hopefully works
-            best.{' '}
+            best.{" "}
             <strong>
               In this situation, an advanced model is a bad choice.
-            </strong>{' '}
+            </strong>{" "}
             An advanced model will train slower while overfitting this small and
             simple training data.
           </p>
           <div className="GroupUp">
             <button
               className={
-                this.state.currentModel === 'Simple'
-                  ? 'myButton activeModel'
-                  : 'myButton'
+                this.state.currentModel === "Simple"
+                  ? "myButton activeModel"
+                  : "myButton"
               }
               onClick={async () => {
-                this.setState({ currentModel: 'Simple' })
-                const model = getSimpleModel()
+                this.setState({ currentModel: "Simple" });
+                const model = getSimpleModel();
                 tfvis.show.modelSummary(
-                  { name: 'Simple Model Architecture' },
+                  { name: "Simple Model Architecture" },
                   model
-                )
-                this.model = model
+                );
+                this.model = model;
               }}
             >
               Create Simple Model
             </button>
             <button
               className={
-                this.state.currentModel === 'Advanced'
-                  ? 'myButton activeModel'
-                  : 'myButton'
+                this.state.currentModel === "Advanced"
+                  ? "myButton activeModel"
+                  : "myButton"
               }
               onClick={async () => {
-                this.setState({ currentModel: 'Advanced' })
-                const model = getAdvancedModel()
+                this.setState({ currentModel: "Advanced" });
+                const model = getAdvancedModel();
                 tfvis.show.modelSummary(
-                  { name: 'Advanced Model Architecture' },
+                  { name: "Advanced Model Architecture" },
                   model
-                )
-                this.model = model
+                );
+                this.model = model;
               }}
             >
               Create Advanced Model
@@ -218,10 +218,10 @@ class App extends Component {
             className="myButton"
             onClick={async () => {
               // stop errors
-              if (!this.data) return
-              if (!this.model) return
-              await showAccuracy(this.model, this.data)
-              await showConfusion(this.model, this.data, 'Untrained Matrix')
+              if (!this.data) return;
+              if (!this.model) return;
+              await showAccuracy(this.model, this.data);
+              await showConfusion(this.model, this.data, "Untrained Matrix");
             }}
           >
             Check Untrained Model Results
@@ -234,16 +234,16 @@ class App extends Component {
             className="myButton"
             onClick={async () => {
               // stop errors
-              if (!this.data) return
-              if (!this.model) return
-              const numEpochs = this.state.currentModel === 'Simple' ? 12 : 20
-              await train(this.model, this.data, numEpochs)
+              if (!this.data) return;
+              if (!this.model) return;
+              const numEpochs = this.state.currentModel === "Simple" ? 12 : 20;
+              await train(this.model, this.data, numEpochs);
             }}
           >
             Train Your {this.state.currentModel} Model
           </button>
           <p>
-            Now that our model has seen some stuff{' '}
+            Now that our model has seen some stuff{" "}
             <span role="img" aria-label="woah">
               😳
             </span>
@@ -255,14 +255,14 @@ class App extends Component {
             className="myButton"
             onClick={async () => {
               // stop errors
-              if (!this.data) return
-              if (!this.model) return
-              await showAccuracy(this.model, this.data, 'Trained Accuracy')
+              if (!this.data) return;
+              if (!this.model) return;
+              await showAccuracy(this.model, this.data, "Trained Accuracy");
               await showConfusion(
                 this.model,
                 this.data,
-                'Trained Confusion Matrix'
-              )
+                "Trained Confusion Matrix"
+              );
             }}
           >
             Check Model After Training
@@ -275,12 +275,12 @@ class App extends Component {
           <p>
             The simple model size comes out to about 48Kb, but some models can
             be as large as 20+MBs! It depends how simple you keep the model. If
-            you want the model trained above, you get two files by{' '}
+            you want the model trained above, you get two files by{" "}
             <a
               className="pointy"
               onClick={async () => {
-                if (!this.model) return
-                await this.model.save('downloads://rps-model')
+                if (!this.model) return;
+                await this.model.save("downloads://rps-model");
               }}
             >
               clicking here
@@ -304,18 +304,18 @@ class App extends Component {
             className="myButton"
             onClick={async () => {
               // stop errors
-              if (!this.model) return
+              if (!this.model) return;
               this.setState(
                 prevState => ({
                   advancedDemo: false,
                   webcamActive: !prevState.webcamActive,
-                  camMessage: ''
+                  camMessage: ""
                 }),
                 this.detectWebcam
-              )
+              );
             }}
           >
-            {this.state.webcamActive ? 'Turn Webcam Off' : 'Launch Webcam'}
+            {this.state.webcamActive ? "Turn Webcam Off" : "Launch Webcam"}
           </button>
           {this._renderWebcam()}
           <p>
@@ -335,12 +335,12 @@ class App extends Component {
               this.setState(prevState => ({
                 webcamActive: false,
                 advancedDemo: !prevState.advancedDemo
-              }))
+              }));
             }}
           >
             {this.state.advancedDemo
-              ? 'Turn Off Advanced Demo'
-              : 'Show Advanced Demo'}
+              ? "Turn Off Advanced Demo"
+              : "Show Advanced Demo"}
           </button>
           {this._renderAdvancedModel()}
           <p>
@@ -351,7 +351,7 @@ class App extends Component {
           </p>
           <p>
             If you'd like to see more applications of TensorFlow.js be sure to
-            check out{' '}
+            check out{" "}
             <a
               href="https://nsfwjs.com"
               target="_blank"
@@ -359,7 +359,7 @@ class App extends Component {
             >
               NSFWJS.com
             </a>
-            , or the very useful{' '}
+            , or the very useful{" "}
             <a
               href="https://nicornot.com"
               target="_blank"
@@ -368,14 +368,14 @@ class App extends Component {
               NicOrNot.com
             </a>
             . For more entertaining applications of Machine Learning, be sure to
-            subscribe to our{' '}
+            subscribe to our{" "}
             <a
-              href="https://infinite.red/machinelearning"
+              href="https://ai-fyi.com"
               target="_blank"
               rel="noopener noreferrer"
             >
               Newsletter
-            </a>{' '}
+            </a>{" "}
             or follow my Fun Machine Learning Twitter account:
           </p>
 
@@ -384,16 +384,28 @@ class App extends Component {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="fml.png" style={{ width: '50%', marginLeft: '25%' }} />
-            <p style={{ textAlign: 'center' }}>@FunMachineLearn</p>
+            <img
+              src="fml.png"
+              alt="Fun Machine Learn Logo"
+              style={{ width: "50%", marginLeft: "25%" }}
+            />
+            <p style={{ textAlign: "center" }}>@FunMachineLearn</p>
           </a>
         </div>
         <div className="GroupUp">
           <p className="outro">
             Follow me (Gant Laborde) and Infinite Red for cool new experiments,
-            and let us know what cool things you've come up with.{' '}
+            and let us know what cool things you've come up with.{" "}
             <em>
-              We can help, we're available for AI consulting and training.
+              We can help, we're available for AI consulting and{" "}
+              <a
+                href="https://academy.infinite.red/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                training
+              </a>
+              .
             </em>
           </p>
         </div>
@@ -401,7 +413,7 @@ class App extends Component {
           <img src={gant} className="wiggle me" alt="Gant Laborde" />
           <ul id="footer">
             <li>
-              Website:{' '}
+              Website:{" "}
               <a
                 href="http://gantlaborde.com"
                 target="_blank"
@@ -411,7 +423,7 @@ class App extends Component {
               </a>
             </li>
             <li>
-              Twitter:{' '}
+              Twitter:{" "}
               <a
                 href="https://twitter.com/gantlaborde"
                 target="_blank"
@@ -421,7 +433,7 @@ class App extends Component {
               </a>
             </li>
             <li>
-              Medium:{' '}
+              Medium:{" "}
               <a
                 href="https://medium.freecodecamp.org/@gantlaborde"
                 target="_blank"
@@ -431,7 +443,7 @@ class App extends Component {
               </a>
             </li>
             <li>
-              ML Twitter:{' '}
+              ML Twitter:{" "}
               <a
                 href="https://twitter.com/FunMachineLearn"
                 target="_blank"
@@ -441,7 +453,7 @@ class App extends Component {
               </a>
             </li>
             <li>
-              GitHub:{' '}
+              GitHub:{" "}
               <a
                 href="https://github.com/GantMan/rps_tfjs_demo"
                 target="_blank"
@@ -451,13 +463,13 @@ class App extends Component {
               </a>
             </li>
             <li>
-              Newsletter:{' '}
+              Newsletter:{" "}
               <a
-                href="https://infinite.red/machinelearning"
+                href="https://ai-fyi.com"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                ML Newsletter
+                AI-FYI.com
               </a>
             </li>
             <li>
@@ -472,18 +484,18 @@ class App extends Component {
           </ul>
         </div>
         <div className="GroupUp">
-          <img src="./ml.png" id="closer" />
+          <img src="./ml.png" id="closer" alt="RPS" />
           <h4>powered by</h4>
           <img
             src="./TF_FullColor_Horizontal.png"
             id="closer"
             alt="Tensorflow logo"
-            style={{ paddingLeft: '-40px' }}
+            style={{ paddingLeft: "-40px" }}
           />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;
