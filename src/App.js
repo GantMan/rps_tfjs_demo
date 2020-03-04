@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Webcam from "react-webcam";
 import gant from "./corn.png";
+import "./Buttons.css";
 import "./App.css";
 import { RPSDataset } from "./tfjs/data.js";
 import { getAdvancedModel, getSimpleModel } from "./tfjs/models.js";
@@ -133,19 +134,24 @@ class App extends Component {
             <span className="cod">`</span> or <span className="cod">~</span> key
             to hide this menu.
           </p>
-          <button
-            className="myButton"
-            onClick={async () => {
-              this.setState({ loadDataMessage: "Loading 10MB Data" });
-              const data = new RPSDataset();
-              this.data = data;
-              await data.load();
-              await showExamples(data);
-              this.setState({ loadDataMessage: "Data Loaded!" });
-            }}
-          >
-            {this.state.loadDataMessage}
-          </button>
+          <div className="GroupUp">
+            <button
+              className="btn-3d blue"
+              onClick={async () => {
+                this.setState({ loadDataMessage: "Loading 10MB Data" });
+                const data = new RPSDataset();
+                this.data = data;
+                await data.load();
+                await showExamples(data);
+                this.setState({ loadDataMessage: "Data Loaded!" });
+              }}
+            >
+              {this.state.loadDataMessage}
+            </button>
+            <button className="btn-3d green">
+              <strong>&lt;/&gt;</strong>
+            </button>
+          </div>
           <p>
             Each of the examples have been loaded now. Due to this being a
             browser, the data is loaded with one{" "}
@@ -176,8 +182,8 @@ class App extends Component {
             <button
               className={
                 this.state.currentModel === "Simple"
-                  ? "myButton activeModel"
-                  : "myButton"
+                  ? "btn-3d blue activeModel"
+                  : "btn-3d blue"
               }
               onClick={async () => {
                 this.setState({ currentModel: "Simple" });
@@ -191,11 +197,17 @@ class App extends Component {
             >
               Create Simple Model
             </button>
+            <button className="btn-3d green">
+              <strong>&lt;/&gt;</strong>
+            </button>
+          </div>
+          <p>OR</p>
+          <div className="GroupUp">
             <button
               className={
                 this.state.currentModel === "Advanced"
-                  ? "myButton activeModel"
-                  : "myButton"
+                  ? "btn-3d blue activeModel"
+                  : "btn-3d blue"
               }
               onClick={async () => {
                 this.setState({ currentModel: "Advanced" });
@@ -209,39 +221,53 @@ class App extends Component {
             >
               Create Advanced Model
             </button>
+            <button className="btn-3d green">
+              <strong>&lt;/&gt;</strong>
+            </button>
           </div>
           <p>
             Creating a model, is the structure and blueprint. It starts off able
             to, but terrible at predicting.
           </p>
-          <button
-            className="myButton"
-            onClick={async () => {
-              // stop errors
-              if (!this.data) return;
-              if (!this.model) return;
-              await showAccuracy(this.model, this.data);
-              await showConfusion(this.model, this.data, "Untrained Matrix");
-            }}
-          >
-            Check Untrained Model Results
-          </button>
+          <div className="GroupUp">
+            <button
+              className="btn-3d blue"
+              onClick={async () => {
+                // stop errors
+                if (!this.data) return;
+                if (!this.model) return;
+                await showAccuracy(this.model, this.data);
+                await showConfusion(this.model, this.data, "Untrained Matrix");
+              }}
+            >
+              Check Untrained Model Results
+            </button>
+            <button className="btn-3d green">
+              <strong>&lt;/&gt;</strong>
+            </button>
+          </div>
           <p>
             Train your Model with your training data. In this case 2100 labeled
             images, over and over... but not <em>toooooo much.</em>
           </p>
-          <button
-            className="myButton"
-            onClick={async () => {
-              // stop errors
-              if (!this.data) return;
-              if (!this.model) return;
-              const numEpochs = this.state.currentModel === "Simple" ? 12 : 20;
-              await train(this.model, this.data, numEpochs);
-            }}
-          >
-            Train Your {this.state.currentModel} Model
-          </button>
+          <div className="GroupUp">
+            <button
+              className="btn-3d blue"
+              onClick={async () => {
+                // stop errors
+                if (!this.data) return;
+                if (!this.model) return;
+                const numEpochs =
+                  this.state.currentModel === "Simple" ? 12 : 20;
+                await train(this.model, this.data, numEpochs);
+              }}
+            >
+              Train Your {this.state.currentModel} Model
+            </button>
+            <button className="btn-3d green">
+              <strong>&lt;/&gt;</strong>
+            </button>
+          </div>
           <p>
             Now that our model has seen some stuff{" "}
             <span role="img" aria-label="woah">
@@ -252,7 +278,7 @@ class App extends Component {
             RPS images it's never seen before.
           </p>
           <button
-            className="myButton"
+            className="btn-3d blue"
             onClick={async () => {
               // stop errors
               if (!this.data) return;
@@ -301,7 +327,7 @@ class App extends Component {
             converted to a 64x64 grayscale image for your model to classify.
           </p>
           <button
-            className="myButton"
+            className="btn-3d blue"
             onClick={async () => {
               // stop errors
               if (!this.model) return;
@@ -330,7 +356,7 @@ class App extends Component {
             inspiring!
           </p>
           <button
-            className="myButton"
+            className="btn-3d blue"
             onClick={() => {
               this.setState(prevState => ({
                 webcamActive: false,
@@ -378,7 +404,6 @@ class App extends Component {
             </a>{" "}
             or follow my Fun Machine Learning Twitter account:
           </p>
-
           <a
             href="https://twitter.com/FunMachineLearn"
             target="_blank"
