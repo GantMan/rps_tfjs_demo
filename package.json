@@ -10,9 +10,12 @@
   "dependencies": {
     "@tensorflow/tfjs": "^1.0.4",
     "@tensorflow/tfjs-vis": "^1.0.3",
+    "ace-builds": "^1.4.8",
     "react": "^16.8.6",
+    "react-ace": "^8.0.0",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
+    "react-slidedown": "^2.4.5",
     "react-webcam": "^1.1.1",
     "seedrandom": "~2.4.3"
   },
