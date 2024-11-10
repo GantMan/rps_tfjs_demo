@@ -1,3 +1,5 @@
+## ⚠️ WARNING:  This version of TFJS does not work with Appl M chips 
+
 # Tensorflow JS - Rock Paper Scissors
 ![rps header logo](./public/rps_logo.jpg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/ecb46145-5398-4a57-8cb5-888ba8ae2545/deploy-status)](https://app.netlify.com/sites/rps-tfjs/deploys)
